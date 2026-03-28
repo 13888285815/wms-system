@@ -32,6 +32,17 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
       <h1 className="flex-1 text-lg font-semibold text-gray-800">{title}</h1>
 
+      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 rounded-lg border border-purple-200 text-xs">
+        <span className="text-purple-600 font-medium">⚡</span>
+        <span className="text-purple-700 font-semibold">
+          {subscriptionStore.getTokensAvailable() === Infinity 
+            ? '∞' 
+            : subscriptionStore.getTokensAvailable().toLocaleString()
+          }
+        </span>
+        <span className="text-purple-500">tokens</span>
+      </div>
+
       {/* Language selector */}
       <div className="relative">
         <button
