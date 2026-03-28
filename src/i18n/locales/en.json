@@ -1,0 +1,80 @@
+{
+  "app": { "title": "Multi-Warehouse Management System", "loading": "Loading..." },
+  "nav": {
+    "dashboard": "Dashboard", "warehouses": "Warehouses", "inventory": "Inventory",
+    "inbound": "Inbound", "outbound": "Outbound", "orders": "Orders",
+    "suppliers": "Suppliers", "users": "Users", "reports": "Reports", "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard Overview", "totalWarehouses": "Total Warehouses",
+    "totalProducts": "Product Types", "totalStock": "Total Stock", "pendingOrders": "Pending Orders",
+    "recentActivity": "Recent Activity", "stockAlert": "Stock Alert",
+    "lowStock": "Low Stock", "monthlyIn": "Monthly Inbound", "monthlyOut": "Monthly Outbound"
+  },
+  "warehouse": {
+    "title": "Warehouse Management", "add": "Add Warehouse", "edit": "Edit Warehouse",
+    "delete": "Delete Warehouse", "name": "Warehouse Name", "location": "Location",
+    "manager": "Manager", "capacity": "Capacity (units)", "status": "Status",
+    "active": "Active", "inactive": "Inactive", "contactPhone": "Phone", "notes": "Notes"
+  },
+  "inventory": {
+    "title": "Inventory Management", "product": "Product Name", "sku": "SKU",
+    "warehouse": "Warehouse", "quantity": "Quantity", "minStock": "Min Stock",
+    "maxStock": "Max Stock", "unit": "Unit", "category": "Category",
+    "supplier": "Supplier", "lastUpdated": "Last Updated", "stockStatus": "Stock Status",
+    "normal": "Normal", "low": "Low", "overstock": "Overstock", "transfer": "Transfer"
+  },
+  "inbound": {
+    "title": "Inbound Management", "add": "New Inbound", "orderNo": "Order No.",
+    "warehouse": "Warehouse", "supplier": "Supplier", "product": "Product",
+    "quantity": "Quantity", "unitPrice": "Unit Price", "totalAmount": "Total",
+    "operator": "Operator", "inboundDate": "Inbound Date", "status": "Status",
+    "pending": "Pending", "approved": "Approved", "completed": "Completed", "cancelled": "Cancelled"
+  },
+  "outbound": {
+    "title": "Outbound Management", "add": "New Outbound", "orderNo": "Order No.",
+    "warehouse": "Warehouse", "destination": "Destination", "product": "Product",
+    "quantity": "Quantity", "operator": "Operator", "outboundDate": "Outbound Date",
+    "status": "Status", "reason": "Reason"
+  },
+  "order": {
+    "title": "Order Management", "orderNo": "Order No.", "customer": "Customer",
+    "products": "Products", "totalAmount": "Total", "status": "Status",
+    "createdAt": "Created At", "pending": "Pending", "processing": "Processing",
+    "shipped": "Shipped", "completed": "Completed", "cancelled": "Cancelled"
+  },
+  "supplier": {
+    "title": "Supplier Management", "add": "Add Supplier", "name": "Supplier Name",
+    "contact": "Contact", "phone": "Phone", "email": "Email",
+    "address": "Address", "category": "Category", "status": "Status",
+    "active": "Active", "inactive": "Inactive"
+  },
+  "user": {
+    "title": "User Management", "add": "Add User", "username": "Username",
+    "name": "Name", "role": "Role", "email": "Email", "phone": "Phone",
+    "warehouse": "Warehouse", "status": "Status",
+    "admin": "Super Admin", "manager": "Warehouse Manager", "operator": "Operator", "viewer": "Viewer",
+    "active": "Active", "inactive": "Inactive", "lastLogin": "Last Login"
+  },
+  "reports": {
+    "title": "Reports", "stockReport": "Stock Report", "inboundReport": "Inbound Report",
+    "outboundReport": "Outbound Report", "orderReport": "Order Report",
+    "exportExcel": "Export Excel", "exportCSV": "Export CSV",
+    "dateRange": "Date Range", "startDate": "Start Date", "endDate": "End Date",
+    "warehouse": "Warehouse", "allWarehouses": "All Warehouses"
+  },
+  "common": {
+    "add": "Add", "edit": "Edit", "delete": "Delete", "save": "Save", "cancel": "Cancel",
+    "confirm": "Confirm", "search": "Search", "filter": "Filter", "reset": "Reset",
+    "export": "Export", "import": "Import", "total": "Total", "actions": "Actions",
+    "status": "Status", "createdAt": "Created At", "updatedAt": "Updated At",
+    "noData": "No Data", "loading": "Loading...", "success": "Success", "error": "Error",
+    "confirmDelete": "Confirm delete this record?", "yes": "Yes", "no": "No",
+    "page": "Page {{current}} / {{total}}", "perPage": "Per page", "rows": "rows"
+  },
+  "login": {
+    "title": "Sign In", "username": "Username", "password": "Password",
+    "login": "Login", "remember": "Remember me", "forgotPassword": "Forgot password",
+    "demoHint": "Demo: admin / 123456"
+  }
+}

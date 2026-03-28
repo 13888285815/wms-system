@@ -1,0 +1,80 @@
+{
+  "app": { "title": "نظام إدارة المستودعات المتعددة", "loading": "جارٍ التحميل..." },
+  "nav": {
+    "dashboard": "لوحة التحكم", "warehouses": "المستودعات", "inventory": "المخزون",
+    "inbound": "الوارد", "outbound": "الصادر", "orders": "الطلبات",
+    "suppliers": "الموردون", "users": "المستخدمون", "reports": "التقارير", "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "title": "نظرة عامة", "totalWarehouses": "إجمالي المستودعات", "totalProducts": "أنواع المنتجات",
+    "totalStock": "إجمالي المخزون", "pendingOrders": "الطلبات المعلقة",
+    "recentActivity": "النشاط الأخير", "stockAlert": "تنبيه المخزون",
+    "lowStock": "مخزون منخفض", "monthlyIn": "الوارد الشهري", "monthlyOut": "الصادر الشهري"
+  },
+  "warehouse": {
+    "title": "إدارة المستودعات", "add": "إضافة مستودع", "edit": "تعديل",
+    "delete": "حذف", "name": "اسم المستودع", "location": "الموقع", "manager": "المدير",
+    "capacity": "السعة", "status": "الحالة", "active": "نشط", "inactive": "غير نشط",
+    "contactPhone": "الهاتف", "notes": "ملاحظات"
+  },
+  "inventory": {
+    "title": "إدارة المخزون", "product": "المنتج", "sku": "رمز المنتج",
+    "warehouse": "المستودع", "quantity": "الكمية", "minStock": "الحد الأدنى",
+    "maxStock": "الحد الأقصى", "unit": "الوحدة", "category": "الفئة",
+    "supplier": "المورد", "lastUpdated": "آخر تحديث", "stockStatus": "حالة المخزون",
+    "normal": "طبيعي", "low": "منخفض", "overstock": "فائض", "transfer": "نقل"
+  },
+  "inbound": {
+    "title": "إدارة الوارد", "add": "إضافة وارد", "orderNo": "رقم الإيصال",
+    "warehouse": "المستودع", "supplier": "المورد", "product": "المنتج",
+    "quantity": "الكمية", "unitPrice": "سعر الوحدة", "totalAmount": "الإجمالي",
+    "operator": "المشغل", "inboundDate": "تاريخ الاستلام", "status": "الحالة",
+    "pending": "معلق", "approved": "موافق عليه", "completed": "مكتمل", "cancelled": "ملغى"
+  },
+  "outbound": {
+    "title": "إدارة الصادر", "add": "إضافة صادر", "orderNo": "رقم الإيصال",
+    "warehouse": "المستودع", "destination": "الوجهة", "product": "المنتج",
+    "quantity": "الكمية", "operator": "المشغل", "outboundDate": "تاريخ الصرف",
+    "status": "الحالة", "reason": "السبب"
+  },
+  "order": {
+    "title": "إدارة الطلبات", "orderNo": "رقم الطلب", "customer": "العميل",
+    "products": "المنتجات", "totalAmount": "الإجمالي", "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء", "pending": "معلق", "processing": "قيد المعالجة",
+    "shipped": "تم الشحن", "completed": "مكتمل", "cancelled": "ملغى"
+  },
+  "supplier": {
+    "title": "إدارة الموردين", "add": "إضافة مورد", "name": "الاسم",
+    "contact": "جهة الاتصال", "phone": "الهاتف", "email": "البريد الإلكتروني",
+    "address": "العنوان", "category": "الفئة", "status": "الحالة",
+    "active": "نشط", "inactive": "غير نشط"
+  },
+  "user": {
+    "title": "إدارة المستخدمين", "add": "إضافة مستخدم", "username": "اسم المستخدم",
+    "name": "الاسم", "role": "الدور", "email": "البريد الإلكتروني", "phone": "الهاتف",
+    "warehouse": "المستودع", "status": "الحالة",
+    "admin": "مدير النظام", "manager": "مدير المستودع", "operator": "مشغل", "viewer": "قارئ",
+    "active": "نشط", "inactive": "غير نشط", "lastLogin": "آخر تسجيل دخول"
+  },
+  "reports": {
+    "title": "التقارير", "stockReport": "تقرير المخزون", "inboundReport": "تقرير الوارد",
+    "outboundReport": "تقرير الصادر", "orderReport": "تقرير الطلبات",
+    "exportExcel": "تصدير Excel", "exportCSV": "تصدير CSV",
+    "dateRange": "نطاق التاريخ", "startDate": "تاريخ البداية", "endDate": "تاريخ النهاية",
+    "warehouse": "المستودع", "allWarehouses": "جميع المستودعات"
+  },
+  "common": {
+    "add": "إضافة", "edit": "تعديل", "delete": "حذف", "save": "حفظ", "cancel": "إلغاء",
+    "confirm": "تأكيد", "search": "بحث", "filter": "تصفية", "reset": "إعادة تعيين",
+    "export": "تصدير", "import": "استيراد", "total": "الإجمالي", "actions": "إجراءات",
+    "status": "الحالة", "createdAt": "تاريخ الإنشاء", "updatedAt": "تاريخ التحديث",
+    "noData": "لا توجد بيانات", "loading": "جارٍ التحميل...", "success": "نجاح", "error": "خطأ",
+    "confirmDelete": "هل تريد حذف هذا السجل؟", "yes": "نعم", "no": "لا",
+    "page": "صفحة {{current}} / {{total}}", "perPage": "لكل صفحة", "rows": "سجلات"
+  },
+  "login": {
+    "title": "تسجيل الدخول", "username": "اسم المستخدم", "password": "كلمة المرور",
+    "login": "دخول", "remember": "تذكرني", "forgotPassword": "نسيت كلمة المرور",
+    "demoHint": "تجريبي: admin / 123456"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "app": { "title": "Système de Gestion Multi-Entrepôts", "loading": "Chargement..." },
+  "nav": {
+    "dashboard": "Tableau de bord", "warehouses": "Entrepôts", "inventory": "Inventaire",
+    "inbound": "Entrées", "outbound": "Sorties", "orders": "Commandes",
+    "suppliers": "Fournisseurs", "users": "Utilisateurs", "reports": "Rapports", "settings": "Paramètres"
+  },
+  "dashboard": {
+    "title": "Vue d'ensemble", "totalWarehouses": "Entrepôts", "totalProducts": "Types de produits",
+    "totalStock": "Stock total", "pendingOrders": "Commandes en attente",
+    "recentActivity": "Activité récente", "stockAlert": "Alerte stock",
+    "lowStock": "Stock faible", "monthlyIn": "Entrées mensuelles", "monthlyOut": "Sorties mensuelles"
+  },
+  "warehouse": {
+    "title": "Gestion des entrepôts", "add": "Ajouter entrepôt", "edit": "Modifier",
+    "delete": "Supprimer", "name": "Nom", "location": "Adresse", "manager": "Responsable",
+    "capacity": "Capacité", "status": "Statut", "active": "Actif", "inactive": "Inactif",
+    "contactPhone": "Téléphone", "notes": "Notes"
+  },
+  "inventory": {
+    "title": "Gestion des stocks", "product": "Produit", "sku": "SKU",
+    "warehouse": "Entrepôt", "quantity": "Quantité", "minStock": "Stock min",
+    "maxStock": "Stock max", "unit": "Unité", "category": "Catégorie",
+    "supplier": "Fournisseur", "lastUpdated": "Dernière mise à jour", "stockStatus": "Statut",
+    "normal": "Normal", "low": "Faible", "overstock": "Excédent", "transfer": "Transfert"
+  },
+  "inbound": {
+    "title": "Gestion des entrées", "add": "Nouvelle entrée", "orderNo": "N° de bon",
+    "warehouse": "Entrepôt", "supplier": "Fournisseur", "product": "Produit",
+    "quantity": "Quantité", "unitPrice": "Prix unitaire", "totalAmount": "Total",
+    "operator": "Opérateur", "inboundDate": "Date d'entrée", "status": "Statut",
+    "pending": "En attente", "approved": "Approuvé", "completed": "Terminé", "cancelled": "Annulé"
+  },
+  "outbound": {
+    "title": "Gestion des sorties", "add": "Nouvelle sortie", "orderNo": "N° de bon",
+    "warehouse": "Entrepôt", "destination": "Destination", "product": "Produit",
+    "quantity": "Quantité", "operator": "Opérateur", "outboundDate": "Date de sortie",
+    "status": "Statut", "reason": "Raison"
+  },
+  "order": {
+    "title": "Gestion des commandes", "orderNo": "N° commande", "customer": "Client",
+    "products": "Produits", "totalAmount": "Total", "status": "Statut",
+    "createdAt": "Créé le", "pending": "En attente", "processing": "En cours",
+    "shipped": "Expédié", "completed": "Terminé", "cancelled": "Annulé"
+  },
+  "supplier": {
+    "title": "Gestion fournisseurs", "add": "Ajouter fournisseur", "name": "Nom",
+    "contact": "Contact", "phone": "Téléphone", "email": "Email",
+    "address": "Adresse", "category": "Catégorie", "status": "Statut",
+    "active": "Actif", "inactive": "Inactif"
+  },
+  "user": {
+    "title": "Gestion utilisateurs", "add": "Ajouter utilisateur", "username": "Identifiant",
+    "name": "Nom", "role": "Rôle", "email": "Email", "phone": "Téléphone",
+    "warehouse": "Entrepôt", "status": "Statut",
+    "admin": "Super Admin", "manager": "Manager", "operator": "Opérateur", "viewer": "Lecteur",
+    "active": "Actif", "inactive": "Inactif", "lastLogin": "Dernière connexion"
+  },
+  "reports": {
+    "title": "Rapports", "stockReport": "Rapport de stock", "inboundReport": "Rapport d'entrées",
+    "outboundReport": "Rapport de sorties", "orderReport": "Rapport de commandes",
+    "exportExcel": "Exporter Excel", "exportCSV": "Exporter CSV",
+    "dateRange": "Période", "startDate": "Date début", "endDate": "Date fin",
+    "warehouse": "Entrepôt", "allWarehouses": "Tous les entrepôts"
+  },
+  "common": {
+    "add": "Ajouter", "edit": "Modifier", "delete": "Supprimer", "save": "Enregistrer",
+    "cancel": "Annuler", "confirm": "Confirmer", "search": "Rechercher", "filter": "Filtrer",
+    "reset": "Réinitialiser", "export": "Exporter", "import": "Importer", "total": "Total",
+    "actions": "Actions", "status": "Statut", "createdAt": "Créé le", "updatedAt": "Modifié le",
+    "noData": "Aucune donnée", "loading": "Chargement...", "success": "Succès", "error": "Erreur",
+    "confirmDelete": "Confirmer la suppression?", "yes": "Oui", "no": "Non",
+    "page": "Page {{current}} / {{total}}", "perPage": "Par page", "rows": "lignes"
+  },
+  "login": {
+    "title": "Connexion", "username": "Identifiant", "password": "Mot de passe",
+    "login": "Se connecter", "remember": "Se souvenir", "forgotPassword": "Mot de passe oublié",
+    "demoHint": "Démo: admin / 123456"
+  }
+}

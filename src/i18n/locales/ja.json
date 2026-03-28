@@ -1,0 +1,80 @@
+{
+  "app": { "title": "マルチ倉庫管理システム", "loading": "読み込み中..." },
+  "nav": {
+    "dashboard": "ダッシュボード", "warehouses": "倉庫管理", "inventory": "在庫管理",
+    "inbound": "入庫管理", "outbound": "出庫管理", "orders": "注文管理",
+    "suppliers": "仕入先", "users": "ユーザー管理", "reports": "レポート", "settings": "設定"
+  },
+  "dashboard": {
+    "title": "ダッシュボード概要", "totalWarehouses": "倉庫数", "totalProducts": "商品種類数",
+    "totalStock": "総在庫数", "pendingOrders": "処理待ち注文",
+    "recentActivity": "最近の活動", "stockAlert": "在庫アラート",
+    "lowStock": "在庫不足", "monthlyIn": "今月入庫", "monthlyOut": "今月出庫"
+  },
+  "warehouse": {
+    "title": "倉庫管理", "add": "倉庫追加", "edit": "編集",
+    "delete": "削除", "name": "倉庫名", "location": "所在地", "manager": "担当者",
+    "capacity": "収容量", "status": "ステータス", "active": "有効", "inactive": "無効",
+    "contactPhone": "電話番号", "notes": "備考"
+  },
+  "inventory": {
+    "title": "在庫管理", "product": "商品名", "sku": "SKUコード",
+    "warehouse": "倉庫", "quantity": "在庫数", "minStock": "最低在庫",
+    "maxStock": "最大在庫", "unit": "単位", "category": "カテゴリ",
+    "supplier": "仕入先", "lastUpdated": "最終更新", "stockStatus": "在庫状態",
+    "normal": "正常", "low": "不足", "overstock": "過剰", "transfer": "在庫移動"
+  },
+  "inbound": {
+    "title": "入庫管理", "add": "入庫追加", "orderNo": "入庫番号",
+    "warehouse": "倉庫", "supplier": "仕入先", "product": "商品",
+    "quantity": "数量", "unitPrice": "単価", "totalAmount": "合計金額",
+    "operator": "担当者", "inboundDate": "入庫日", "status": "ステータス",
+    "pending": "審査待ち", "approved": "承認済み", "completed": "完了", "cancelled": "キャンセル"
+  },
+  "outbound": {
+    "title": "出庫管理", "add": "出庫追加", "orderNo": "出庫番号",
+    "warehouse": "倉庫", "destination": "送付先", "product": "商品",
+    "quantity": "数量", "operator": "担当者", "outboundDate": "出庫日",
+    "status": "ステータス", "reason": "理由"
+  },
+  "order": {
+    "title": "注文管理", "orderNo": "注文番号", "customer": "顧客",
+    "products": "商品", "totalAmount": "合計金額", "status": "ステータス",
+    "createdAt": "作成日時", "pending": "処理待ち", "processing": "処理中",
+    "shipped": "発送済み", "completed": "完了", "cancelled": "キャンセル"
+  },
+  "supplier": {
+    "title": "仕入先管理", "add": "仕入先追加", "name": "仕入先名",
+    "contact": "担当者", "phone": "電話", "email": "メール",
+    "address": "住所", "category": "カテゴリ", "status": "ステータス",
+    "active": "取引中", "inactive": "停止"
+  },
+  "user": {
+    "title": "ユーザー管理", "add": "ユーザー追加", "username": "ユーザー名",
+    "name": "氏名", "role": "権限", "email": "メール", "phone": "電話",
+    "warehouse": "所属倉庫", "status": "ステータス",
+    "admin": "スーパー管理者", "manager": "倉庫マネージャー", "operator": "オペレーター", "viewer": "閲覧者",
+    "active": "有効", "inactive": "無効", "lastLogin": "最終ログイン"
+  },
+  "reports": {
+    "title": "レポート", "stockReport": "在庫レポート", "inboundReport": "入庫レポート",
+    "outboundReport": "出庫レポート", "orderReport": "注文レポート",
+    "exportExcel": "Excel出力", "exportCSV": "CSV出力",
+    "dateRange": "期間", "startDate": "開始日", "endDate": "終了日",
+    "warehouse": "倉庫", "allWarehouses": "全倉庫"
+  },
+  "common": {
+    "add": "追加", "edit": "編集", "delete": "削除", "save": "保存", "cancel": "キャンセル",
+    "confirm": "確認", "search": "検索", "filter": "絞り込み", "reset": "リセット",
+    "export": "エクスポート", "import": "インポート", "total": "合計", "actions": "操作",
+    "status": "ステータス", "createdAt": "作成日時", "updatedAt": "更新日時",
+    "noData": "データなし", "loading": "読み込み中...", "success": "成功", "error": "エラー",
+    "confirmDelete": "このレコードを削除しますか？", "yes": "はい", "no": "いいえ",
+    "page": "{{current}} / {{total}} ページ", "perPage": "表示件数", "rows": "件"
+  },
+  "login": {
+    "title": "ログイン", "username": "ユーザー名", "password": "パスワード",
+    "login": "ログイン", "remember": "ログイン状態を保持", "forgotPassword": "パスワードを忘れた",
+    "demoHint": "デモ: admin / 123456"
+  }
+}
