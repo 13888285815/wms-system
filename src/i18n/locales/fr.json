@@ -1,80 +1,48 @@
 {
-  "app": { "title": "Système de Gestion Multi-Entrepôts", "loading": "Chargement..." },
+  "app": { "title": "WMS Système Cloud" },
   "nav": {
     "dashboard": "Tableau de bord", "warehouses": "Entrepôts", "inventory": "Inventaire",
     "inbound": "Entrées", "outbound": "Sorties", "orders": "Commandes",
-    "suppliers": "Fournisseurs", "users": "Utilisateurs", "reports": "Rapports", "settings": "Paramètres"
+    "suppliers": "Fournisseurs", "users": "Utilisateurs", "reports": "Rapports",
+    "settings": "Paramètres", "subscription": "Abonnement"
   },
-  "dashboard": {
-    "title": "Vue d'ensemble", "totalWarehouses": "Entrepôts", "totalProducts": "Types de produits",
-    "totalStock": "Stock total", "pendingOrders": "Commandes en attente",
-    "recentActivity": "Activité récente", "stockAlert": "Alerte stock",
-    "lowStock": "Stock faible", "monthlyIn": "Entrées mensuelles", "monthlyOut": "Sorties mensuelles"
-  },
-  "warehouse": {
-    "title": "Gestion des entrepôts", "add": "Ajouter entrepôt", "edit": "Modifier",
-    "delete": "Supprimer", "name": "Nom", "location": "Adresse", "manager": "Responsable",
-    "capacity": "Capacité", "status": "Statut", "active": "Actif", "inactive": "Inactif",
-    "contactPhone": "Téléphone", "notes": "Notes"
-  },
-  "inventory": {
-    "title": "Gestion des stocks", "product": "Produit", "sku": "SKU",
-    "warehouse": "Entrepôt", "quantity": "Quantité", "minStock": "Stock min",
-    "maxStock": "Stock max", "unit": "Unité", "category": "Catégorie",
-    "supplier": "Fournisseur", "lastUpdated": "Dernière mise à jour", "stockStatus": "Statut",
-    "normal": "Normal", "low": "Faible", "overstock": "Excédent", "transfer": "Transfert"
-  },
-  "inbound": {
-    "title": "Gestion des entrées", "add": "Nouvelle entrée", "orderNo": "N° de bon",
-    "warehouse": "Entrepôt", "supplier": "Fournisseur", "product": "Produit",
-    "quantity": "Quantité", "unitPrice": "Prix unitaire", "totalAmount": "Total",
-    "operator": "Opérateur", "inboundDate": "Date d'entrée", "status": "Statut",
-    "pending": "En attente", "approved": "Approuvé", "completed": "Terminé", "cancelled": "Annulé"
-  },
-  "outbound": {
-    "title": "Gestion des sorties", "add": "Nouvelle sortie", "orderNo": "N° de bon",
-    "warehouse": "Entrepôt", "destination": "Destination", "product": "Produit",
-    "quantity": "Quantité", "operator": "Opérateur", "outboundDate": "Date de sortie",
-    "status": "Statut", "reason": "Raison"
-  },
-  "order": {
-    "title": "Gestion des commandes", "orderNo": "N° commande", "customer": "Client",
-    "products": "Produits", "totalAmount": "Total", "status": "Statut",
-    "createdAt": "Créé le", "pending": "En attente", "processing": "En cours",
-    "shipped": "Expédié", "completed": "Terminé", "cancelled": "Annulé"
-  },
-  "supplier": {
-    "title": "Gestion fournisseurs", "add": "Ajouter fournisseur", "name": "Nom",
-    "contact": "Contact", "phone": "Téléphone", "email": "Email",
-    "address": "Adresse", "category": "Catégorie", "status": "Statut",
-    "active": "Actif", "inactive": "Inactif"
-  },
-  "user": {
-    "title": "Gestion utilisateurs", "add": "Ajouter utilisateur", "username": "Identifiant",
-    "name": "Nom", "role": "Rôle", "email": "Email", "phone": "Téléphone",
-    "warehouse": "Entrepôt", "status": "Statut",
-    "admin": "Super Admin", "manager": "Manager", "operator": "Opérateur", "viewer": "Lecteur",
-    "active": "Actif", "inactive": "Inactif", "lastLogin": "Dernière connexion"
-  },
-  "reports": {
-    "title": "Rapports", "stockReport": "Rapport de stock", "inboundReport": "Rapport d'entrées",
-    "outboundReport": "Rapport de sorties", "orderReport": "Rapport de commandes",
-    "exportExcel": "Exporter Excel", "exportCSV": "Exporter CSV",
-    "dateRange": "Période", "startDate": "Date début", "endDate": "Date fin",
-    "warehouse": "Entrepôt", "allWarehouses": "Tous les entrepôts"
-  },
+  "user": { "admin": "Super Admin", "manager": "Gestionnaire", "operator": "Opérateur", "viewer": "Lecteur" },
   "common": {
-    "add": "Ajouter", "edit": "Modifier", "delete": "Supprimer", "save": "Enregistrer",
-    "cancel": "Annuler", "confirm": "Confirmer", "search": "Rechercher", "filter": "Filtrer",
-    "reset": "Réinitialiser", "export": "Exporter", "import": "Importer", "total": "Total",
-    "actions": "Actions", "status": "Statut", "createdAt": "Créé le", "updatedAt": "Modifié le",
-    "noData": "Aucune donnée", "loading": "Chargement...", "success": "Succès", "error": "Erreur",
-    "confirmDelete": "Confirmer la suppression?", "yes": "Oui", "no": "Non",
-    "page": "Page {{current}} / {{total}}", "perPage": "Par page", "rows": "lignes"
+    "search": "Rechercher", "add": "Ajouter", "edit": "Modifier", "delete": "Supprimer", "save": "Enregistrer",
+    "cancel": "Annuler", "confirm": "Confirmer", "actions": "Actions", "status": "Statut",
+    "name": "Nom", "notes": "Notes", "all": "Tout", "loading": "Chargement...",
+    "noData": "Aucune donnée", "total": "Total", "page": "Page", "prev": "Précédent", "next": "Suivant",
+    "active": "Actif", "inactive": "Inactif", "export": "Exporter CSV"
   },
-  "login": {
-    "title": "Connexion", "username": "Identifiant", "password": "Mot de passe",
-    "login": "Se connecter", "remember": "Se souvenir", "forgotPassword": "Mot de passe oublié",
-    "demoHint": "Démo: admin / 123456"
+  "auth": {
+    "login": "Connexion", "logout": "Déconnexion", "username": "Utilisateur", "password": "Mot de passe",
+    "rememberMe": "Se souvenir de moi", "forgotPassword": "Mot de passe oublié ?", "signingIn": "Connexion...",
+    "loginError": "Utilisateur ou mot de passe incorrect", "demoAccount": "Compte de démo"
+  },
+  "subscription": {
+    "title": "Abonnement et Facturation", "subtitle": "Gérez votre forfait, vos factures et l'usage des jetons AI",
+    "plans": "Forfaits", "billing": "Facturation", "apiUsage": "Usage API",
+    "monthly": "Mensuel", "annual": "Annuel", "save20": "Économisez 20%",
+    "currentPlan": "Forfait actuel", "upgrade": "Améliorer", "downgrade": "Rétrograder",
+    "mostPopular": "Le plus populaire", "billedAnnually": "Facturé annuellement",
+    "cancelSubscription": "Résilier l'abonnement", "reactivate": "Réactiver",
+    "nextRenewal": "Prochain renouvellement", "billedMonthly": "Facturé mensuellement",
+    "tokenBalance": "Solde de jetons AI", "remaining": "Restant", "used": "Utilisé",
+    "totalTokens": "Total", "includedInPlan": "Inclus dans le forfait", "extraPurchased": "Acheté en plus",
+    "overagePrice": "Prix de dépassement", "buyMoreTokens": "Acheter des jetons",
+    "unlimitedTokens": "Jetons illimités", "tokensPerMonth": "Jetons / mois",
+    "overage": "Dépassement", "tokens": "Jetons",
+    "verifyEmail": "Veuillez vérifier votre email pour sécuriser votre compte",
+    "sendCode": "Envoyer le code", "verifyTitle": "Vérifier l'email", "verifySubtitle": "Entrez le code à 6 chiffres envoyé à votre email",
+    "verify": "Vérifier", "alreadyVerified": "Vérifié",
+    "billingHistory": "Historique de facturation", "noBillingRecords": "Aucun enregistrement de facturation",
+    "date": "Date", "description": "Description", "amount": "Montant", "type": "Type",
+    "simulateCall": "Simuler un appel AI", "simulateSubtitle": "Simulez des appels API AI et suivez l'usage des jetons",
+    "chooseModel": "Choisir le modèle", "inputTokens": "Jetons d'entrée", "outputTokens": "Jetons de sortie",
+    "estimatedCost": "Coût estimé", "totalTokensLabel": "Jetons totaux", "runApiCall": "Lancer l'appel API",
+    "callHistory": "Historique des appels", "runSimulationHint": "Les résultats apparaîtront ici après la simulation",
+    "buyMoreDesc": "Achetez des jetons supplémentaires sans date d'expiration",
+    "chargedPer1k": "Votre forfait facture pour 1000 jetons",
+    "mo": "mois", "per1kTokens": "/ 1000 jetons"
   }
 }
