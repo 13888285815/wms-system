@@ -2,9 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
+/* RTL support */
+[dir="rtl"] .sidebar { right: 0; left: auto; }
+/* [dir="rtl"] .flex { flex-direction: row-reverse; } */
+/* We don't reverse all flex containers, only specific ones needed for RTL if they don't use logical properties */
+
+/* Responsive font sizes */
+html { font-size: clamp(13px, 1.5vw, 16px); }
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Smooth scrolling */
+* { scroll-behavior: smooth; }
+
+/* Custom utility for RTL spacing/positioning if not using tailwind-rtl plugin */
+[dir="rtl"] .ml-auto { margin-left: 0 !important; margin-right: auto !important; }
+[dir="rtl"] .mr-auto { margin-right: 0 !important; margin-left: auto !important; }
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
 
 body {
   margin: 0;
@@ -15,98 +37,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* RTL support for Arabic */
-[dir="rtl"] {
-  text-align: right;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* ─── Responsive & Device Adaptations ─────────────────────────────────────── */
-
-/* Safe area insets for iOS notch / Android navigation bar */
+/* Safe area insets */
 body {
   padding-env: safe-area-inset-bottom;
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-}
-
-/* Prevent text size adjustment on orientation change (iOS) */
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
-
-/* Smooth scrolling */
-html { scroll-behavior: smooth; }
-
-/* Touch action optimization */
-button, a, [role="button"] {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Prevent double-tap zoom on interactive elements */
-input, select, textarea {
-  font-size: 16px; /* prevents iOS auto-zoom on focus */
-}
-
-/* RTL layout support */
-[dir="rtl"] .sidebar-translate { transform: translateX(100%); }
-[dir="rtl"] .sidebar-translate.open { transform: translateX(0); }
-[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
-[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
-
-/* High DPI / Retina display */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-}
-
-/* Large screen optimization (4K/ultrawide) */
-@media (min-width: 1920px) {
-  .container-xl { max-width: 1800px; margin: 0 auto; }
-}
-
-/* Small screen (< 375px - older iPhones) */
-@media (max-width: 374px) {
-  .text-sm { font-size: 0.8rem; }
-  .px-6 { padding-left: 1rem; padding-right: 1rem; }
-}
-
-/* Tablet landscape */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-  aside { width: 220px; }
-}
-
-/* Print styles */
-@media print {
-  aside, header, .no-print { display: none !important; }
-  main { margin: 0; padding: 0; }
-}
-
-/* Focus visible for keyboard navigation (accessibility) */
-:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
-
-/* Scrollbar mobile hide */
-@media (max-width: 768px) {
-  ::-webkit-scrollbar { display: none; }
-  * { -ms-overflow-style: none; scrollbar-width: none; }
 }
