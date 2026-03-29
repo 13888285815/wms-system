@@ -1,16 +1,20 @@
 /**
- * Security utilities - XSS prevention, input sanitization, rate limiting
+ * Security utilities - XSS prevention, input sanitization, rate limiting, and secure token generation
  */
 
 // ─── Input Sanitization ───────────────────────────────────────────────────────
 
 /**
  * Strip all HTML tags and dangerous characters from user input
- * Pure-JS implementation (no DOMPurify dependency needed for text-only fields)
+ * Limits to 500 characters
  */
 export function sanitizeText(input: unknown): string {
   if (typeof input !== 'string') return '';
-  return input
+  
+  // Remove HTML tags
+  const noTags = input.replace(/<[^>]*>?/gm, '');
+  
+  return noTags
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -20,19 +24,21 @@ export function sanitizeText(input: unknown): string {
     .replace(/`/g, '&#x60;')
     .replace(/=/g, '&#x3D;')
     .trim()
-    .slice(0, 1000); // max length guard
+    .slice(0, 500); // restricted to 500 chars as requested
 }
 
 /**
- * Sanitize and validate email addresses
+ * Strict email sanitization and validation
  */
 export function sanitizeEmail(email: string): string {
-  const cleaned = email.replace(/[^a-zA-Z0-9@._+-]/g, '').toLowerCase().slice(0, 254);
-  return cleaned;
+  if (!email || typeof email !== 'string') return '';
+  // Only allow valid email characters
+  const cleaned = email.replace(/[^a-zA-Z0-9@._+-]/g, '').toLowerCase().trim();
+  return cleaned.slice(0, 254);
 }
 
 /**
- * Validate email format
+ * Validate email format strictly
  */
 export function isValidEmail(email: string): boolean {
   const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -40,29 +46,54 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
- * Sanitize numeric input - returns 0 for invalid values
+ * Recursive sanitization for storage
  */
-export function sanitizeNumber(input: unknown, min = 0, max = 999999999): number {
-  const n = Number(input);
-  if (!isFinite(n) || isNaN(n)) return 0;
-  return Math.max(min, Math.min(max, Math.floor(n)));
+export function sanitizeForStorage<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'string') {
+    return sanitizeText(obj) as unknown as T;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(v => sanitizeForStorage(v)) as unknown as T;
+  }
+  
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        result[key] = sanitizeForStorage((obj as any)[key]);
+      }
+    }
+    return result as T;
+  }
+  
+  return obj;
 }
 
 /**
- * Sanitize a whole form object - applies sanitizeText to all string fields
+ * Validate password strength: 8+ chars, letters and numbers
  */
-export function sanitizeFormData<T extends Record<string, unknown>>(data: T): T {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(data)) {
-    if (typeof value === 'string') {
-      result[key] = sanitizeText(value);
-    } else if (typeof value === 'number') {
-      result[key] = sanitizeNumber(value);
-    } else {
-      result[key] = value;
-    }
+export function validatePassword(pwd: string): { valid: boolean; message: string } {
+  if (pwd.length < 8) {
+    return { valid: false, message: '密码至少需要8个字符' };
   }
-  return result as T;
+  if (!/[a-zA-Z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+    return { valid: false, message: '密码必须包含字母和数字' };
+  }
+  return { valid: true, message: '密码强度符合要求' };
+}
+
+// ─── Token Generation ─────────────────────────────────────────────────────────
+
+/**
+ * Generate a secure 32-byte hex token
+ */
+export function generateSecureToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 // ─── Rate Limiter ─────────────────────────────────────────────────────────────
@@ -76,10 +107,6 @@ const rateLimitStore = new Map<string, RateLimitEntry>();
 
 /**
  * Simple in-memory rate limiter
- * @param key     unique action identifier (e.g. 'login:user@example.com')
- * @param limit   max attempts per window
- * @param windowMs window duration in ms (default 60s)
- * @returns true if allowed, false if rate-limited
  */
 export function checkRateLimit(key: string, limit = 5, windowMs = 60_000): boolean {
   const now = Date.now();
@@ -99,47 +126,7 @@ export function getRateLimitRemaining(key: string, limit = 5): number {
   return Math.max(0, limit - entry.count);
 }
 
-// ─── CSRF Token ───────────────────────────────────────────────────────────────
-
-let _csrfToken: string | null = null;
-
-export function getCsrfToken(): string {
-  if (!_csrfToken) {
-    const arr = new Uint8Array(32);
-    crypto.getRandomValues(arr);
-    _csrfToken = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
-    sessionStorage.setItem('csrf_token', _csrfToken);
-  }
-  return _csrfToken;
-}
-
-export function validateCsrfToken(token: string): boolean {
-  return token === sessionStorage.getItem('csrf_token');
-}
-
-// ─── Password Strength ────────────────────────────────────────────────────────
-
-export interface PasswordStrength {
-  score: 0 | 1 | 2 | 3 | 4;
-  label: string;
-  color: string;
-}
-
-export function checkPasswordStrength(password: string): PasswordStrength {
-  let score = 0;
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
-  if (/[0-9]/.test(password)) score++;
-  if (/[^A-Za-z0-9]/.test(password)) score++;
-  score = Math.min(4, score) as 0 | 1 | 2 | 3 | 4;
-
-  const labels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
-  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
-  return { score: score as 0|1|2|3|4, label: labels[score], color: colors[score] };
-}
-
-// ─── Content Security Policy (meta tag injection) ─────────────────────────────
+// ─── Content Security Policy ──────────────────────────────────────────────────
 
 export function injectCSPMeta(): void {
   if (document.querySelector('meta[http-equiv="Content-Security-Policy"]')) return;
@@ -147,7 +134,7 @@ export function injectCSPMeta(): void {
   meta.httpEquiv = 'Content-Security-Policy';
   meta.content = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'", // needed for Vite/React
+    "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
@@ -159,7 +146,7 @@ export function injectCSPMeta(): void {
   document.head.prepend(meta);
 }
 
-// ─── SQL / NoSQL injection pattern detection ──────────────────────────────────
+// ─── Injection Detection ──────────────────────────────────────────────────────
 
 const INJECTION_PATTERNS = [
   /('|"|;|--|\/\*|\*\/|xp_|exec\s|union\s+select|drop\s+table|insert\s+into|delete\s+from|update\s+\w+\s+set)/i,
@@ -167,6 +154,9 @@ const INJECTION_PATTERNS = [
   /javascript:/i,
   /on\w+\s*=/i,
   /data:text\/html/i,
+  /\$where/i, // NoSQL
+  /\{\s*\$ne/i, // NoSQL
+  /\{\s*\$gt/i, // NoSQL
 ];
 
 export function containsInjection(input: string): boolean {
@@ -174,11 +164,11 @@ export function containsInjection(input: string): boolean {
 }
 
 /**
- * Safe guard for any user input before storage
+ * Safe guard for any user input
  */
 export function guardInput(input: string, fieldName = 'field'): { safe: boolean; reason?: string; value: string } {
   if (containsInjection(input)) {
-    return { safe: false, reason: `${fieldName} contains invalid characters`, value: '' };
+    return { safe: false, reason: `${fieldName} 包含非法字符`, value: '' };
   }
   return { safe: true, value: sanitizeText(input) };
 }
