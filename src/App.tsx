@@ -7,7 +7,7 @@ import { injectCSPMeta } from './utils/security';
 import { User } from './types';
 import './i18n';
 
-// Pages
+// WMS Pages
 import DashboardPage from './pages/Dashboard';
 import WarehousesPage from './pages/Warehouses';
 import InventoryPage from './pages/Inventory';
@@ -21,21 +21,35 @@ import { SettingsPage } from './pages/Settings';
 import SubscriptionPage from './pages/Subscription';
 import LoginPage from './pages/Login';
 
-type Page = 'dashboard' | 'warehouses' | 'inventory' | 'inbound' | 'outbound'
-  | 'orders' | 'suppliers' | 'users' | 'reports' | 'settings' | 'subscription';
+// ERP Pages
+import FinancePage from './pages/Finance';
+import HRPage from './pages/HR';
+import CRMPage from './pages/CRM';
+import PurchasePage from './pages/Purchase';
+import ProductionPage from './pages/Production';
+
+type Page =
+  | 'dashboard' | 'warehouses' | 'inventory' | 'inbound' | 'outbound'
+  | 'orders' | 'suppliers' | 'users' | 'reports' | 'settings' | 'subscription'
+  | 'finance' | 'hr' | 'crm' | 'purchase' | 'production';
 
 const pageTitles: Record<string, string> = {
-  dashboard: '仪表盘',
+  dashboard: '工作台',
   warehouses: '仓库管理',
   inventory: '库存管理',
   inbound: '入库管理',
   outbound: '出库管理',
-  orders: '订单管理',
-  suppliers: '供应商管理',
+  orders: '销售订单',
+  suppliers: '供应商',
   users: '用户管理',
   reports: '报表中心',
   settings: '系统设置',
   subscription: '订阅与计费',
+  finance: '财务管理',
+  hr: '人力资源',
+  crm: '客户关系',
+  purchase: '采购管理',
+  production: '生产管理',
 };
 
 function App() {
@@ -45,27 +59,26 @@ function App() {
   const [layoutDir, setLayoutDir] = useState<'ltr' | 'rtl'>('ltr');
 
   useEffect(() => {
-    // Inject CSP meta tag for extra security
     injectCSPMeta();
-    
-    // Detect document direction for responsive RTL support
     const currentDir = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
     setLayoutDir(currentDir);
-
-    // Check if already logged in
     const state = store.getState();
     if (state.currentUser) setCurrentUser(state.currentUser);
+
+    // Listen for direction changes (language switch)
+    const observer = new MutationObserver(() => {
+      setLayoutDir((document.documentElement.dir as 'ltr' | 'rtl') || 'ltr');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
+    return () => observer.disconnect();
   }, []);
 
   const handleLogin = (user: User) => setCurrentUser(user);
   const handleLogout = () => { store.logout(); setCurrentUser(null); };
 
-  const getPageTitle = () => {
-    return pageTitles[currentPage] || '仓库管理系统';
-  };
-
   const renderPage = () => {
     switch (currentPage) {
+      // WMS
       case 'dashboard':    return <DashboardPage />;
       case 'warehouses':   return <WarehousesPage />;
       case 'inventory':    return <InventoryPage />;
@@ -77,6 +90,12 @@ function App() {
       case 'reports':      return <ReportsPage />;
       case 'settings':     return <SettingsPage />;
       case 'subscription': return <SubscriptionPage />;
+      // ERP
+      case 'finance':      return <FinancePage />;
+      case 'hr':           return <HRPage />;
+      case 'crm':          return <CRMPage />;
+      case 'purchase':     return <PurchasePage />;
+      case 'production':   return <ProductionPage />;
       default:             return <DashboardPage />;
     }
   };
@@ -94,12 +113,11 @@ function App() {
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header title={getPageTitle()} onMenuClick={() => setSidebarOpen(true)} />
+        <Header title={pageTitles[currentPage] || 'ERP Cloud'} onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           {renderPage()}
         </main>
       </div>
-      {/* Global Toast notifications */}
       <ToastContainer />
     </div>
   );
