@@ -1,68 +1,55 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Plus, Search, Edit2, Trash2, MapPin, User, Phone } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, MapPin, Phone, Building2, User } from 'lucide-react';
 import { store } from '../../store';
 import { Warehouse, StatusActive } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
+import { useRefresh } from '../../store/reactive';
 
 const Warehouses: React.FC = () => {
-  const { t } = useTranslation();
+  const [, refresh] = useRefresh();
   const [search, setSearch] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Warehouse | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const [formData, setFormData] = useState<Omit<Warehouse, 'id' | 'createdAt' | 'usedCapacity'>>({
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Partial<Warehouse>>({
     name: '',
-    location: '',
     manager: '',
-    capacity: 0,
-    status: 'active',
     contactPhone: '',
-    notes: '',
+    capacity: 1000,
+    location: '',
+    status: 'active' as StatusActive,
+    notes: ''
   });
 
-  const state = store.getState();
-  const warehouses = state.warehouses;
+  const warehouses = store.getState().warehouses;
 
   const filteredData = useMemo(() => {
-    return warehouses.filter(w =>
-      w.name.toLowerCase().includes(search.toLowerCase()) ||
+    return warehouses.filter(w => 
+      w.name.toLowerCase().includes(search.toLowerCase()) || 
       w.location.toLowerCase().includes(search.toLowerCase())
     );
   }, [warehouses, search]);
 
-  const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredData.slice(start, start + pageSize);
-  }, [filteredData, currentPage]);
-
   const totalPages = Math.ceil(filteredData.length / pageSize);
+  const currentData = filteredData.slice((page - 1) * pageSize, page * pageSize);
 
-  const handleOpenModal = (item?: Warehouse) => {
-    if (item) {
-      setEditingItem(item);
-      setFormData({
-        name: item.name,
-        location: item.location,
-        manager: item.manager,
-        capacity: item.capacity,
-        status: item.status,
-        contactPhone: item.contactPhone,
-        notes: item.notes,
-      });
+  const handleOpenModal = (warehouse?: Warehouse) => {
+    if (warehouse) {
+      setEditingId(warehouse.id);
+      setFormData(warehouse);
     } else {
-      setEditingItem(null);
+      setEditingId(null);
       setFormData({
         name: '',
-        location: '',
         manager: '',
-        capacity: 0,
-        status: 'active',
         contactPhone: '',
-        notes: '',
+        capacity: 1000,
+        location: '',
+        status: 'active',
+        notes: ''
       });
     }
     setIsModalOpen(true);
@@ -70,230 +57,267 @@ const Warehouses: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingItem) {
-      store.updateWarehouse(editingItem.id, formData);
+    if (editingId) {
+      store.updateWarehouse(editingId, formData);
     } else {
-      store.addWarehouse(formData);
+      store.addWarehouse(formData as any);
     }
+    refresh();
     setIsModalOpen(false);
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t('common.confirmDelete'))) {
+    if (window.confirm('确定要删除该仓库吗？此操作不可撤销。')) {
       store.deleteWarehouse(id);
+      refresh();
     }
   };
 
+  const getCapacityColor = (used: number, total: number) => {
+    const ratio = used / total;
+    if (ratio > 0.9) return 'bg-red-500';
+    if (ratio > 0.8) return 'bg-orange-500';
+    return 'bg-green-500';
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t('warehouses.title')}</h1>
-        <Button onClick={() => handleOpenModal()} className="w-full md:w-auto">
-          <Plus size={20} />
-          {t('warehouses.addWarehouse')}
+    <div className="p-6 space-y-6">
+      {/* 顶部标题栏 */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">仓库管理</h1>
+          <p className="text-sm text-gray-500 mt-1">管理系统内所有存储网点及其状态</p>
+        </div>
+        <Button onClick={() => handleOpenModal()} className="shadow-sm">
+          <Plus size={18} />
+          新增仓库
         </Button>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      {/* 搜索栏 */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder={t('warehouses.searchPlaceholder')}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            placeholder="搜索仓库名称或地址..."
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 transition-all text-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* 列表表格 */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
-              <tr>
-                <th className="px-6 py-3 font-medium">{t('warehouses.name')}</th>
-                <th className="px-6 py-3 font-medium">{t('warehouses.location')}</th>
-                <th className="px-6 py-3 font-medium">{t('warehouses.manager')}</th>
-                <th className="px-6 py-3 font-medium">{t('warehouses.capacity')}</th>
-                <th className="px-6 py-3 font-medium">{t('warehouses.status')}</th>
-                <th className="px-6 py-4 font-medium text-right">{t('common.actions')}</th>
+            <thead>
+              <tr className="bg-gray-50/50 border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">仓库名称</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">地址</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">负责人 & 电话</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">容量占用</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">状态</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-sm">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <MapPin size={14} />
-                        {item.location}
+            <tbody className="divide-y divide-gray-50">
+              {currentData.map((w) => (
+                <tr key={w.id} className="hover:bg-gray-50/50 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                        <Building2 size={16} />
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">
-                      <div className="flex flex-col">
-                        <span className="flex items-center gap-1 text-gray-900 font-medium">
-                          <User size={14} /> {item.manager}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs">
-                          <Phone size={12} /> {item.contactPhone}
-                        </span>
+                      <span className="font-bold text-gray-800">{w.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1.5 max-w-[200px] truncate">
+                      <MapPin size={14} className="text-gray-400 shrink-0" />
+                      {w.location}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm">
+                      <div className="font-medium text-gray-700 flex items-center gap-1">
+                        <User size={14} className="text-gray-400" />
+                        {w.manager}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">
-                      <div className="flex flex-col gap-1 w-24">
-                        <div className="flex justify-between text-xs">
-                          <span>{item.usedCapacity} / {item.capacity}</span>
-                          <span>{Math.round((item.usedCapacity / item.capacity) * 100)}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${item.usedCapacity / item.capacity > 0.9 ? 'bg-red-500' : 'bg-green-500'}`}
-                            style={{ width: `${Math.min(100, (item.usedCapacity / item.capacity) * 100)}%` }}
-                          />
-                        </div>
+                      <div className="text-gray-400 flex items-center gap-1 mt-0.5">
+                        <Phone size={12} />
+                        {w.contactPhone}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {t(`common.status.${item.status}`)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="w-full max-w-[120px]">
+                      <div className="flex justify-between text-[10px] mb-1 font-medium text-gray-400">
+                        <span>{Math.round((w.usedCapacity / w.capacity) * 100)}%</span>
+                        <span>{w.usedCapacity}/{w.capacity}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${getCapacityColor(w.usedCapacity, w.capacity)}`}
+                          style={{ width: `${(w.usedCapacity / w.capacity) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {w.status === 'active' ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        启用
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleOpenModal(item)}>
-                          <Edit2 size={16} />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50" onClick={() => handleDelete(item.id)}>
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                        停用
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => handleOpenModal(w)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(w.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {currentData.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-400">{t('common.noData')}</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    未找到相关仓库信息
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
-        {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{t('common.pagination', { current: currentPage, total: totalPages })}</span>
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(p => p - 1)}
-              >
-                {t('common.prev')}
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(p => p + 1)}
-              >
-                {t('common.next')}
-              </Button>
-            </div>
+        
+        {/* 分页 */}
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
+          <span className="text-sm text-gray-500 font-medium">
+            第 {page} 页 / 共 {totalPages || 1} 页
+          </span>
+          <div className="flex gap-2">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              disabled={page === 1}
+              onClick={() => setPage(p => p - 1)}
+            >
+              上一页
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              disabled={page === totalPages || totalPages === 0}
+              onClick={() => setPage(p => p + 1)}
+            >
+              下一页
+            </Button>
           </div>
-        )}
+        </div>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingItem ? t('warehouses.editWarehouse') : t('warehouses.addWarehouse')}
+      {/* 编辑/新增 Modal */}
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        title={editingId ? '编辑仓库' : '新增仓库'}
         size="lg"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.name')}</label>
-              <input
-                type="text"
-                required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.manager')}</label>
-              <input
-                type="text"
-                required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.manager}
-                onChange={e => setFormData({ ...formData, manager: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.contactPhone')}</label>
-              <input
-                type="text"
-                required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.contactPhone}
-                onChange={e => setFormData({ ...formData, contactPhone: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.capacity')}</label>
-              <input
-                type="number"
-                required
-                min="0"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.capacity}
-                onChange={e => setFormData({ ...formData, capacity: Number(e.target.value) })}
-              />
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.location')}</label>
-              <input
-                type="text"
-                required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.location}
-                onChange={e => setFormData({ ...formData, location: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.status')}</label>
-              <select
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.status}
-                onChange={e => setFormData({ ...formData, status: e.target.value as StatusActive })}
-              >
-                <option value="active">{t('common.status.active')}</option>
-                <option value="inactive">{t('common.status.inactive')}</option>
-              </select>
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-gray-700">{t('warehouses.notes')}</label>
-              <textarea
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                value={formData.notes}
-                onChange={e => setFormData({ ...formData, notes: e.target.value })}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5">
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-gray-700">仓库名称</label>
+            <input
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm"
+              value={formData.name || ''}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              placeholder="请输入仓库名称"
+            />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-            <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
-              {t('common.cancel')}
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-gray-700">负责人</label>
+            <input
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm"
+              value={formData.manager || ''}
+              onChange={e => setFormData({ ...formData, manager: e.target.value })}
+              placeholder="请输入负责人姓名"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-gray-700">联系电话</label>
+            <input
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm"
+              value={formData.contactPhone || ''}
+              onChange={e => setFormData({ ...formData, contactPhone: e.target.value })}
+              placeholder="请输入联系电话"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-gray-700">仓库容量 (件/m³)</label>
+            <input
+              required
+              type="number"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm"
+              value={formData.capacity || ''}
+              onChange={e => setFormData({ ...formData, capacity: Number(e.target.value) })}
+              placeholder="请输入容量数值"
+            />
+          </div>
+          <div className="space-y-1.5 col-span-2">
+            <label className="text-sm font-semibold text-gray-700">地址</label>
+            <input
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm"
+              value={formData.location || ''}
+              onChange={e => setFormData({ ...formData, location: e.target.value })}
+              placeholder="请输入详细地址"
+            />
+          </div>
+          <div className="space-y-1.5 col-span-2">
+            <label className="text-sm font-semibold text-gray-700">状态</label>
+            <select
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm bg-white"
+              value={formData.status || 'active'}
+              onChange={e => setFormData({ ...formData, status: e.target.value as StatusActive })}
+            >
+              <option value="active">启用</option>
+              <option value="inactive">停用</option>
+            </select>
+          </div>
+          <div className="space-y-1.5 col-span-2">
+            <label className="text-sm font-semibold text-gray-700">备注</label>
+            <textarea
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm min-h-[80px]"
+              value={formData.notes || ''}
+              onChange={e => setFormData({ ...formData, notes: e.target.value })}
+              placeholder="请输入备注说明（可选）"
+            />
+          </div>
+          <div className="col-span-2 pt-4 flex gap-3">
+            <Button type="submit" className="flex-1 justify-center py-2.5">
+              保存仓库信息
             </Button>
-            <Button variant="primary" type="submit">
-              {t('common.save')}
+            <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)} className="flex-1 justify-center py-2.5">
+              取消
             </Button>
           </div>
         </form>
