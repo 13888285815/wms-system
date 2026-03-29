@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { ToastContainer } from './components/ui/Toast';
@@ -25,15 +24,34 @@ import LoginPage from './pages/Login';
 type Page = 'dashboard' | 'warehouses' | 'inventory' | 'inbound' | 'outbound'
   | 'orders' | 'suppliers' | 'users' | 'reports' | 'settings' | 'subscription';
 
+const pageTitles: Record<string, string> = {
+  dashboard: '仪表盘',
+  warehouses: '仓库管理',
+  inventory: '库存管理',
+  inbound: '入库管理',
+  outbound: '出库管理',
+  orders: '订单管理',
+  suppliers: '供应商管理',
+  users: '用户管理',
+  reports: '报表中心',
+  settings: '系统设置',
+  subscription: '订阅与计费',
+};
+
 function App() {
-  const { t } = useTranslation();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [layoutDir, setLayoutDir] = useState<'ltr' | 'rtl'>('ltr');
 
   useEffect(() => {
     // Inject CSP meta tag for extra security
     injectCSPMeta();
+    
+    // Detect document direction for responsive RTL support
+    const currentDir = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
+    setLayoutDir(currentDir);
+
     // Check if already logged in
     const state = store.getState();
     if (state.currentUser) setCurrentUser(state.currentUser);
@@ -43,8 +61,7 @@ function App() {
   const handleLogout = () => { store.logout(); setCurrentUser(null); };
 
   const getPageTitle = () => {
-    if (currentPage === 'subscription') return 'Subscription & Billing';
-    return t(`nav.${currentPage}`);
+    return pageTitles[currentPage] || '仓库管理系统';
   };
 
   const renderPage = () => {
@@ -67,7 +84,7 @@ function App() {
   if (!currentUser) return <LoginPage onLogin={handleLogin} />;
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden" dir={layoutDir}>
       <Sidebar
         currentPage={currentPage}
         onNavigate={(page) => setCurrentPage(page as Page)}
