@@ -1,80 +1,48 @@
 {
-  "app": { "title": "Multi-Lager-Verwaltungssystem", "loading": "Laden..." },
+  "app": { "title": "WMS Cloud System" },
   "nav": {
-    "dashboard": "Dashboard", "warehouses": "Lager", "inventory": "Inventar",
-    "inbound": "Wareneingang", "outbound": "Warenausgang", "orders": "Bestellungen",
-    "suppliers": "Lieferanten", "users": "Benutzer", "reports": "Berichte", "settings": "Einstellungen"
+    "dashboard": "Dashboard", "warehouses": "Lagerverwaltung", "inventory": "Inventar",
+    "inbound": "Wareneingang", "outbound": "Warenausgang", "orders": "Aufträge",
+    "suppliers": "Lieferanten", "users": "Benutzer", "reports": "Berichte",
+    "settings": "Einstellungen", "subscription": "Abonnement"
   },
-  "dashboard": {
-    "title": "Dashboard-Übersicht", "totalWarehouses": "Lager gesamt", "totalProducts": "Produktarten",
-    "totalStock": "Gesamtbestand", "pendingOrders": "Offene Bestellungen",
-    "recentActivity": "Letzte Aktivitäten", "stockAlert": "Bestandswarnung",
-    "lowStock": "Niedriger Bestand", "monthlyIn": "Monatlicher Eingang", "monthlyOut": "Monatlicher Ausgang"
-  },
-  "warehouse": {
-    "title": "Lagerverwaltung", "add": "Lager hinzufügen", "edit": "Bearbeiten",
-    "delete": "Löschen", "name": "Lagername", "location": "Standort", "manager": "Manager",
-    "capacity": "Kapazität", "status": "Status", "active": "Aktiv", "inactive": "Inaktiv",
-    "contactPhone": "Telefon", "notes": "Notizen"
-  },
-  "inventory": {
-    "title": "Inventarverwaltung", "product": "Produkt", "sku": "SKU",
-    "warehouse": "Lager", "quantity": "Menge", "minStock": "Mindestbestand",
-    "maxStock": "Maximalbestand", "unit": "Einheit", "category": "Kategorie",
-    "supplier": "Lieferant", "lastUpdated": "Zuletzt aktualisiert", "stockStatus": "Bestandsstatus",
-    "normal": "Normal", "low": "Niedrig", "overstock": "Überbestand", "transfer": "Umlagerung"
-  },
-  "inbound": {
-    "title": "Wareneingangsverwaltung", "add": "Neuer Eingang", "orderNo": "Belegnummer",
-    "warehouse": "Lager", "supplier": "Lieferant", "product": "Produkt",
-    "quantity": "Menge", "unitPrice": "Einzelpreis", "totalAmount": "Gesamtbetrag",
-    "operator": "Mitarbeiter", "inboundDate": "Eingangsdatum", "status": "Status",
-    "pending": "Ausstehend", "approved": "Genehmigt", "completed": "Abgeschlossen", "cancelled": "Storniert"
-  },
-  "outbound": {
-    "title": "Warenausgangsverwaltung", "add": "Neuer Ausgang", "orderNo": "Belegnummer",
-    "warehouse": "Lager", "destination": "Ziel", "product": "Produkt",
-    "quantity": "Menge", "operator": "Mitarbeiter", "outboundDate": "Ausgangsdatum",
-    "status": "Status", "reason": "Grund"
-  },
-  "order": {
-    "title": "Bestellverwaltung", "orderNo": "Bestellnummer", "customer": "Kunde",
-    "products": "Produkte", "totalAmount": "Gesamtbetrag", "status": "Status",
-    "createdAt": "Erstellt am", "pending": "Ausstehend", "processing": "In Bearbeitung",
-    "shipped": "Versendet", "completed": "Abgeschlossen", "cancelled": "Storniert"
-  },
-  "supplier": {
-    "title": "Lieferantenverwaltung", "add": "Lieferant hinzufügen", "name": "Name",
-    "contact": "Ansprechpartner", "phone": "Telefon", "email": "E-Mail",
-    "address": "Adresse", "category": "Kategorie", "status": "Status",
-    "active": "Aktiv", "inactive": "Inaktiv"
-  },
-  "user": {
-    "title": "Benutzerverwaltung", "add": "Benutzer hinzufügen", "username": "Benutzername",
-    "name": "Name", "role": "Rolle", "email": "E-Mail", "phone": "Telefon",
-    "warehouse": "Lager", "status": "Status",
-    "admin": "Superadmin", "manager": "Manager", "operator": "Mitarbeiter", "viewer": "Beobachter",
-    "active": "Aktiv", "inactive": "Inaktiv", "lastLogin": "Letzte Anmeldung"
-  },
-  "reports": {
-    "title": "Berichte", "stockReport": "Bestandsbericht", "inboundReport": "Eingangsbericht",
-    "outboundReport": "Ausgangsbericht", "orderReport": "Bestellbericht",
-    "exportExcel": "Excel exportieren", "exportCSV": "CSV exportieren",
-    "dateRange": "Zeitraum", "startDate": "Startdatum", "endDate": "Enddatum",
-    "warehouse": "Lager", "allWarehouses": "Alle Lager"
-  },
+  "user": { "admin": "Super-Administrator", "manager": "Lagermanager", "operator": "Bediener", "viewer": "Betrachter" },
   "common": {
-    "add": "Hinzufügen", "edit": "Bearbeiten", "delete": "Löschen", "save": "Speichern",
-    "cancel": "Abbrechen", "confirm": "Bestätigen", "search": "Suchen", "filter": "Filtern",
-    "reset": "Zurücksetzen", "export": "Exportieren", "import": "Importieren", "total": "Gesamt",
-    "actions": "Aktionen", "status": "Status", "createdAt": "Erstellt am", "updatedAt": "Geändert am",
-    "noData": "Keine Daten", "loading": "Laden...", "success": "Erfolg", "error": "Fehler",
-    "confirmDelete": "Eintrag löschen?", "yes": "Ja", "no": "Nein",
-    "page": "Seite {{current}} / {{total}}", "perPage": "Pro Seite", "rows": "Einträge"
+    "search": "Suchen", "add": "Hinzufügen", "edit": "Bearbeiten", "delete": "Löschen", "save": "Speichern",
+    "cancel": "Abbrechen", "confirm": "Bestätigen", "actions": "Aktionen", "status": "Status",
+    "name": "Name", "notes": "Hinweise", "all": "Alle", "loading": "Laden...",
+    "noData": "Keine Daten verfügbar", "total": "Gesamt", "page": "Seite", "prev": "Vorherige", "next": "Nächste",
+    "active": "Aktiv", "inactive": "Inaktiv", "export": "Exportieren CSV"
   },
-  "login": {
-    "title": "Anmelden", "username": "Benutzername", "password": "Passwort",
-    "login": "Anmelden", "remember": "Angemeldet bleiben", "forgotPassword": "Passwort vergessen",
-    "demoHint": "Demo: admin / 123456"
+  "auth": {
+    "login": "Anmelden", "logout": "Abmelden", "username": "Benutzername", "password": "Passwort",
+    "rememberMe": "Angemeldet bleiben", "forgotPassword": "Passwort vergessen?", "signingIn": "Anmeldung...",
+    "loginError": "Benutzername oder Passwort ungültig", "demoAccount": "Demo-Konto"
+  },
+  "subscription": {
+    "title": "Abonnement & Abrechnung", "subtitle": "Verwalten Sie Plan, Rechnungen und AI-Token-Nutzung",
+    "plans": "Pläne", "billing": "Abrechnung", "apiUsage": "API-Nutzung",
+    "monthly": "Monatlich", "annual": "Jährlich", "save20": "Sparen Sie 20%",
+    "currentPlan": "Aktueller Plan", "upgrade": "Upgrade", "downgrade": "Downgrade",
+    "mostPopular": "Am beliebtesten", "billedAnnually": "Jährlich abgerechnet",
+    "cancelSubscription": "Abonnement kündigen", "reactivate": "Reaktivieren",
+    "nextRenewal": "Nächste Verlängerung", "billedMonthly": "Monatlich abgerechnet",
+    "tokenBalance": "AI-Token-Guthaben", "remaining": "Verbleibend", "used": "Verbraucht",
+    "totalTokens": "Gesamt", "includedInPlan": "Im Plan enthalten", "extraPurchased": "Zusätzlich gekauft",
+    "overagePrice": "Zusatzkosten pro Token", "buyMoreTokens": "Token kaufen",
+    "unlimitedTokens": "Unbegrenzte Token", "tokensPerMonth": "Token / Monat",
+    "overage": "Mehrverbrauch", "tokens": "Token",
+    "verifyEmail": "Bitte verifizieren Sie Ihre E-Mail, um Ihr Konto zu schützen",
+    "sendCode": "Code senden", "verifyTitle": "E-Mail verifizieren", "verifySubtitle": "Geben Sie den 6-stelligen Code ein, der an Ihre E-Mail gesendet wurde",
+    "verify": "Verifizieren", "alreadyVerified": "Verifiziert",
+    "billingHistory": "Rechnungsverlauf", "noBillingRecords": "Keine Rechnungen gefunden",
+    "date": "Datum", "description": "Beschreibung", "amount": "Betrag", "type": "Typ",
+    "simulateCall": "KI-Anruf simulieren", "simulateSubtitle": "Simulieren Sie KI-API-Anrufe und verfolgen Sie den Token-Verbrauch",
+    "chooseModel": "Modell wählen", "inputTokens": "Eingabe-Token", "outputTokens": "Ausgabe-Token",
+    "estimatedCost": "Geschätzte Kosten", "totalTokensLabel": "Gesamt-Token", "runApiCall": "API-Anruf ausführen",
+    "callHistory": "Verlauf der Anrufe", "runSimulationHint": "Ergebnisse erscheinen hier nach der Simulation",
+    "buyMoreDesc": "Kaufen Sie zusätzliche Token, die nie ablaufen",
+    "chargedPer1k": "Ihr Plan rechnet pro 1000 Token ab",
+    "mo": "Monat", "per1kTokens": "/ 1000 Token"
   }
 }
