@@ -1,44 +1,44 @@
-import { Plan, PlanId, BillingCycle, SubscriptionState, BillingRecord, VerificationStatus } from '../types/subscription';
+import { Plan, PlanId, BillingCycle, SubscriptionState, BillingRecord } from '../types/subscription';
 
 const STORAGE_KEY = 'wms_subscription';
 
 export const PLANS: Plan[] = [
   {
     id: 'free',
-    name: 'Free',
+    name: 'Starter',
     monthlyPrice: 0,
     annualPrice: 0,
     aiTokens: 10_000,
-    tokenPrice: 0,        // can't purchase on free
+    tokenPrice: 0,
     warehouses: 1,
     users: 3,
     features: [
-      '1 warehouse',
-      '3 team members',
-      '10,000 AI tokens/mo',
-      'Basic inventory management',
-      'CSV export',
-      'Community support',
+      '1个仓库',
+      '3个团队成员',
+      '每月10,000 AI Token',
+      '基础库存管理',
+      'CSV数据导出',
+      '社区支持',
     ],
   },
   {
     id: 'pro',
-    name: 'Pro',
+    name: 'Professional',
     monthlyPrice: 49,
-    annualPrice: 39,      // per month, billed annually
+    annualPrice: 39,
     aiTokens: 500_000,
-    tokenPrice: 1.5,      // $1.50 per 1000 extra tokens
+    tokenPrice: 1.5,
     warehouses: 10,
     users: 25,
     features: [
-      '10 warehouses',
-      '25 team members',
-      '500,000 AI tokens/mo',
-      'Advanced analytics',
-      'API access',
-      'Priority email support',
-      'Custom integrations',
-      'Audit logs',
+      '10个仓库',
+      '25个团队成员',
+      '每月500,000 AI Token',
+      '高级数据分析',
+      'API接入',
+      '优先邮件支持',
+      '自定义集成',
+      '操作审计日志',
     ],
     highlighted: true,
   },
@@ -47,19 +47,19 @@ export const PLANS: Plan[] = [
     name: 'Enterprise',
     monthlyPrice: 199,
     annualPrice: 159,
-    aiTokens: -1,         // unlimited
+    aiTokens: -1,
     tokenPrice: 0.8,
     warehouses: -1,
     users: -1,
     features: [
-      'Unlimited warehouses',
-      'Unlimited users',
-      'Unlimited AI tokens',
-      'Dedicated account manager',
-      'SLA 99.9% uptime',
-      'Custom SSO / SAML',
-      'On-premise deployment',
-      '24/7 phone support',
+      '无限仓库',
+      '无限用户',
+      '无限AI Token',
+      '专属客户经理',
+      '99.9% SLA保障',
+      '企业SSO/SAML',
+      '私有化部署选项',
+      '7×24小时电话支持',
     ],
   },
 ];
@@ -114,27 +114,26 @@ class SubscriptionStore {
     this.state.verificationExpiry = expiry;
     this.state.emailVerification = 'pending';
     this.save();
-    // In production: send real email. Demo: return code to display
     console.log(`[DEMO] Verification code: ${code}`);
     return code;
   }
 
   verifyCode(code: string): { success: boolean; message: string } {
-    if (this.state.emailVerification === 'verified') return { success: true, message: 'Already verified' };
+    if (this.state.emailVerification === 'verified') return { success: true, message: '已验证' };
     if (!this.state.verificationCode || !this.state.verificationExpiry) {
-      return { success: false, message: 'No verification pending' };
+      return { success: false, message: '没有待处理的验证' };
     }
     if (new Date(this.state.verificationExpiry) < new Date()) {
-      return { success: false, message: 'Code expired' };
+      return { success: false, message: '验证码已过期' };
     }
     if (code !== this.state.verificationCode) {
-      return { success: false, message: 'Invalid code' };
+      return { success: false, message: '验证码无效' };
     }
     this.state.emailVerification = 'verified';
     this.state.verificationCode = undefined;
     this.state.verificationExpiry = undefined;
     this.save();
-    return { success: true, message: 'Email verified successfully' };
+    return { success: true, message: '邮箱验证成功' };
   }
 
   // ─── Subscription Management ──────────────────────────────────────────────
@@ -148,7 +147,7 @@ class SubscriptionStore {
     const record: BillingRecord = {
       id: generateId(),
       date: nowStr(),
-      description: `${plan.name} Plan – ${cycle === 'annual' ? 'Annual' : 'Monthly'} subscription`,
+      description: `${plan.name} 套餐 – ${cycle === 'annual' ? '按年' : '按月'} 订阅`,
       amount: price,
       status: 'paid',
       type: 'subscription',
@@ -163,7 +162,6 @@ class SubscriptionStore {
       cancelAtPeriodEnd: false,
     };
 
-    // Reset token balance for new plan
     const included = plan.aiTokens === -1 ? 999_999_999 : plan.aiTokens;
     this.state.tokenBalance = {
       included,
@@ -191,13 +189,13 @@ class SubscriptionStore {
 
   purchaseTokens(amount: number): BillingRecord | { error: string } {
     const plan = this.getCurrentPlan();
-    if (plan.tokenPrice === 0) return { error: 'Token purchase not available on Free plan' };
+    if (plan.tokenPrice === 0) return { error: 'Starter 套餐无法单独购买 Token' };
 
     const cost = (amount / 1000) * plan.tokenPrice;
     const record: BillingRecord = {
       id: generateId(),
       date: nowStr(),
-      description: `AI Tokens top-up: ${amount.toLocaleString()} tokens`,
+      description: `AI Token 充值: ${amount.toLocaleString()} tokens`,
       amount: parseFloat(cost.toFixed(2)),
       status: 'paid',
       type: 'token_purchase',
@@ -235,7 +233,6 @@ class SubscriptionStore {
     this.save();
   }
 
-  // Demo: simulate AI API call that consumes tokens
   simulateApiCall(modelName: string, inputTokens: number, outputTokens: number): {
     success: boolean;
     tokensUsed: number;
@@ -245,7 +242,7 @@ class SubscriptionStore {
     const total = inputTokens + outputTokens;
     const ok = this.consumeTokens(total);
     if (!ok) {
-      return { success: false, tokensUsed: 0, error: 'Insufficient token balance' };
+      return { success: false, tokensUsed: 0, error: 'Token 余额不足' };
     }
     const plan = this.getCurrentPlan();
     const cost = plan.tokenPrice > 0 ? parseFloat(((total / 1000) * plan.tokenPrice).toFixed(4)) : 0;
