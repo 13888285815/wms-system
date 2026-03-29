@@ -1,4 +1,5 @@
 import { AppState, Warehouse, Supplier, InventoryItem, InboundRecord, OutboundRecord, Order, User } from '../types';
+import { checkRateLimit, sanitizeForStorage } from '../utils/security';
 
 const STORAGE_KEY = 'wms_data';
 
@@ -76,15 +77,27 @@ class Store {
   getState(): AppState { return this.state; }
 
   // Auth
-  login(username: string, password: string): User | null {
+  login(username: string, password: string): { user: User | null; rateLimited?: boolean } {
+    // Check rate limit: 5 times per minute per username
+    if (!checkRateLimit(`login:${username}`, 5, 60000)) {
+      return { user: null, rateLimited: true };
+    }
+
     const user = this.state.users.find(u => u.username === username && u.status === 'active');
-    if (!user) return null;
+    if (!user) return { user: null };
+
     // Demo: password is always '123456' or username for simplicity
-    if (password !== '123456' && password !== username) return null;
+    if (password !== '123456' && password !== username) return { user: null };
+    
     this.state.currentUser = user;
     user.lastLogin = now();
     this.save();
-    return user;
+    return { user };
+  }
+
+  isRateLimited(username: string): boolean {
+    // Internal helper to check if UI should show a wait message
+    return !checkRateLimit(`login:${username}`, 5, 60000);
   }
 
   logout() {
@@ -94,15 +107,17 @@ class Store {
 
   // Generic CRUD
   addWarehouse(data: Omit<Warehouse, 'id' | 'createdAt' | 'usedCapacity'>): Warehouse {
-    const item: Warehouse = { ...data, id: generateId(), usedCapacity: 0, createdAt: now() };
+    const sanitized = sanitizeForStorage(data);
+    const item: Warehouse = { ...sanitized, id: generateId(), usedCapacity: 0, createdAt: now() };
     this.state.warehouses.push(item);
     this.save();
     return item;
   }
 
   updateWarehouse(id: string, data: Partial<Warehouse>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.warehouses.findIndex(w => w.id === id);
-    if (idx >= 0) { this.state.warehouses[idx] = { ...this.state.warehouses[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.warehouses[idx] = { ...this.state.warehouses[idx], ...sanitized }; this.save(); }
   }
 
   deleteWarehouse(id: string): void {
@@ -111,15 +126,17 @@ class Store {
   }
 
   addSupplier(data: Omit<Supplier, 'id' | 'createdAt'>): Supplier {
-    const item: Supplier = { ...data, id: generateId(), createdAt: now() };
+    const sanitized = sanitizeForStorage(data);
+    const item: Supplier = { ...sanitized, id: generateId(), createdAt: now() };
     this.state.suppliers.push(item);
     this.save();
     return item;
   }
 
   updateSupplier(id: string, data: Partial<Supplier>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.suppliers.findIndex(s => s.id === id);
-    if (idx >= 0) { this.state.suppliers[idx] = { ...this.state.suppliers[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.suppliers[idx] = { ...this.state.suppliers[idx], ...sanitized }; this.save(); }
   }
 
   deleteSupplier(id: string): void {
@@ -128,15 +145,17 @@ class Store {
   }
 
   addInventory(data: Omit<InventoryItem, 'id' | 'lastUpdated'>): InventoryItem {
-    const item: InventoryItem = { ...data, id: generateId(), lastUpdated: now() };
+    const sanitized = sanitizeForStorage(data);
+    const item: InventoryItem = { ...sanitized, id: generateId(), lastUpdated: now() };
     this.state.inventory.push(item);
     this.save();
     return item;
   }
 
   updateInventory(id: string, data: Partial<InventoryItem>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.inventory.findIndex(i => i.id === id);
-    if (idx >= 0) { this.state.inventory[idx] = { ...this.state.inventory[idx], ...data, lastUpdated: now() }; this.save(); }
+    if (idx >= 0) { this.state.inventory[idx] = { ...this.state.inventory[idx], ...sanitized, lastUpdated: now() }; this.save(); }
   }
 
   deleteInventory(id: string): void {
@@ -145,8 +164,9 @@ class Store {
   }
 
   addInbound(data: Omit<InboundRecord, 'id' | 'orderNo'>): InboundRecord {
+    const sanitized = sanitizeForStorage(data);
     const count = this.state.inbound.length + 1;
-    const item: InboundRecord = { ...data, id: generateId(), orderNo: `IN-${new Date().getFullYear()}-${String(count).padStart(3,'0')}` };
+    const item: InboundRecord = { ...sanitized, id: generateId(), orderNo: `IN-${new Date().getFullYear()}-${String(count).padStart(3,'0')}` };
     this.state.inbound.push(item);
     // Update inventory
     if (data.status === 'completed') {
@@ -158,8 +178,9 @@ class Store {
   }
 
   updateInbound(id: string, data: Partial<InboundRecord>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.inbound.findIndex(i => i.id === id);
-    if (idx >= 0) { this.state.inbound[idx] = { ...this.state.inbound[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.inbound[idx] = { ...this.state.inbound[idx], ...sanitized }; this.save(); }
   }
 
   deleteInbound(id: string): void {
@@ -168,8 +189,9 @@ class Store {
   }
 
   addOutbound(data: Omit<OutboundRecord, 'id' | 'orderNo'>): OutboundRecord {
+    const sanitized = sanitizeForStorage(data);
     const count = this.state.outbound.length + 1;
-    const item: OutboundRecord = { ...data, id: generateId(), orderNo: `OUT-${new Date().getFullYear()}-${String(count).padStart(3,'0')}` };
+    const item: OutboundRecord = { ...sanitized, id: generateId(), orderNo: `OUT-${new Date().getFullYear()}-${String(count).padStart(3,'0')}` };
     this.state.outbound.push(item);
     if (data.status === 'completed') {
       const inv = this.state.inventory.find(i => i.productId === data.productId && i.warehouseId === data.warehouseId);
@@ -180,8 +202,9 @@ class Store {
   }
 
   updateOutbound(id: string, data: Partial<OutboundRecord>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.outbound.findIndex(i => i.id === id);
-    if (idx >= 0) { this.state.outbound[idx] = { ...this.state.outbound[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.outbound[idx] = { ...this.state.outbound[idx], ...sanitized }; this.save(); }
   }
 
   deleteOutbound(id: string): void {
@@ -190,16 +213,18 @@ class Store {
   }
 
   addOrder(data: Omit<Order, 'id' | 'orderNo' | 'createdAt'>): Order {
+    const sanitized = sanitizeForStorage(data);
     const count = this.state.orders.length + 1;
-    const item: Order = { ...data, id: generateId(), orderNo: `ORD-${new Date().getFullYear()}-${String(count).padStart(3,'0')}`, createdAt: now() };
+    const item: Order = { ...sanitized, id: generateId(), orderNo: `ORD-${new Date().getFullYear()}-${String(count).padStart(3,'0')}`, createdAt: now() };
     this.state.orders.push(item);
     this.save();
     return item;
   }
 
   updateOrder(id: string, data: Partial<Order>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.orders.findIndex(o => o.id === id);
-    if (idx >= 0) { this.state.orders[idx] = { ...this.state.orders[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.orders[idx] = { ...this.state.orders[idx], ...sanitized }; this.save(); }
   }
 
   deleteOrder(id: string): void {
@@ -208,15 +233,17 @@ class Store {
   }
 
   addUser(data: Omit<User, 'id' | 'createdAt' | 'lastLogin'>): User {
-    const item: User = { ...data, id: generateId(), createdAt: now(), lastLogin: '-' };
+    const sanitized = sanitizeForStorage(data);
+    const item: User = { ...sanitized, id: generateId(), createdAt: now(), lastLogin: '-' };
     this.state.users.push(item);
     this.save();
     return item;
   }
 
   updateUser(id: string, data: Partial<User>): void {
+    const sanitized = sanitizeForStorage(data);
     const idx = this.state.users.findIndex(u => u.id === id);
-    if (idx >= 0) { this.state.users[idx] = { ...this.state.users[idx], ...data }; this.save(); }
+    if (idx >= 0) { this.state.users[idx] = { ...this.state.users[idx], ...sanitized }; this.save(); }
   }
 
   deleteUser(id: string): void {
@@ -229,9 +256,21 @@ class Store {
   }
 
   importData(json: string): void {
-    const data = JSON.parse(json);
-    this.state = { ...data, currentUser: null };
-    this.save();
+    try {
+      const data = JSON.parse(json);
+      // Basic schema validation
+      const requiredKeys: (keyof AppState)[] = ['warehouses', 'suppliers', 'inventory', 'inbound', 'outbound', 'orders', 'users'];
+      for (const key of requiredKeys) {
+        if (!Array.isArray(data[key])) {
+          throw new Error(`Invalid data format: ${key} is missing or not an array`);
+        }
+      }
+      this.state = { ...data, currentUser: null };
+      this.save();
+    } catch (e) {
+      console.error('Import failed:', e);
+      throw new Error('导入失败: 格式错误');
+    }
   }
 
   resetData(): void {
