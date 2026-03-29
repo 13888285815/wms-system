@@ -1,262 +1,386 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Modal } from '../../components/ui/Modal';
-import { Button } from '../../components/ui/Button';
-import { Input, Select } from '../../components/ui/Input';
-import { Badge } from '../../components/ui/Badge';
+import React, { useState, useMemo } from 'react';
+import { Plus, Search, Edit2, Trash2, Filter, Warehouse } from 'lucide-react';
 import { store } from '../../store';
-import { Outbound, Warehouse } from '../../types';
+import { OutboundRecord, OrderStatus } from '../../types';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { useRefresh } from '../../store/reactive';
+
+const StatusBadge: React.FC<{ status: OrderStatus }> = ({ status }) => {
+  const configs: Record<string, { label: string; className: string }> = {
+    pending: { label: '待审核', className: 'bg-yellow-100 text-yellow-700' },
+    approved: { label: '已审核', className: 'bg-blue-100 text-blue-700' },
+    completed: { label: '已完成', className: 'bg-green-100 text-green-700' },
+    cancelled: { label: '已取消', className: 'bg-red-100 text-red-700' },
+  };
+  const config = configs[status] || configs.pending;
+  return (
+    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${config.className}`}>
+      {config.label}
+    </span>
+  );
+};
 
 const OutboundPage: React.FC = () => {
-  const { t } = useTranslation();
+  const [, refresh] = useRefresh();
+  const { outbound, warehouses } = store.getState();
   
-  const [data, setData] = useState<Outbound[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [search, setSearch] = useState('');
   const [warehouseFilter, setWarehouseFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Outbound | null>(null);
-  const [formData, setFormData] = useState<Partial<Outbound>>({
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const initialForm: Omit<OutboundRecord, 'id' | 'orderNo'> = {
     warehouseId: '',
+    warehouseName: '',
+    destination: '',
+    productId: 'p-custom',
     productName: '',
     sku: '',
-    destination: '',
     quantity: 0,
     operator: '',
     outboundDate: new Date().toISOString().split('T')[0],
     status: 'pending',
     reason: '',
     notes: '',
-  });
+  };
 
-  useEffect(() => {
-    const state = store.getState();
-    setData(state.outbounds || []);
-    setWarehouses(state.warehouses || []);
-  }, []);
+  const [formData, setFormData] = useState(initialForm);
 
   const filteredData = useMemo(() => {
-    return data.filter(item => {
+    return outbound.filter(item => {
+      const matchesSearch = item.orderNo.toLowerCase().includes(search.toLowerCase()) || 
+                          item.productName.toLowerCase().includes(search.toLowerCase()) ||
+                          item.destination.toLowerCase().includes(search.toLowerCase());
       const matchesWarehouse = warehouseFilter === 'all' || item.warehouseId === warehouseFilter;
-      const matchesSearch = 
-        item.outboundId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.destination?.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesWarehouse && matchesSearch;
-    });
-  }, [data, warehouseFilter, searchQuery]);
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+      return matchesSearch && matchesWarehouse && matchesStatus;
+    }).sort((a, b) => b.outboundDate.localeCompare(a.outboundDate));
+  }, [outbound, search, warehouseFilter, statusFilter]);
 
   const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(start, start + itemsPerPage);
-  }, [filteredData, currentPage]);
+    const start = (page - 1) * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, page]);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / pageSize);
 
-  const handleOpenModal = (item: Outbound | null = null) => {
-    if (item) {
-      setEditingItem(item);
-      setFormData(item);
-    } else {
-      setEditingItem(null);
-      setFormData({
-        warehouseId: warehouses[0]?.id || '',
-        productName: '',
-        sku: '',
-        destination: '',
-        quantity: 0,
-        operator: '',
-        outboundDate: new Date().toISOString().split('T')[0],
-        status: 'pending',
-        reason: '',
-        notes: '',
-      });
-    }
+  const handleOpenAdd = () => {
+    setEditingId(null);
+    setFormData(initialForm);
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
-    const payload = formData as Outbound;
-    if (editingItem) {
-      store.updateOutbound(payload);
-    } else {
-      store.addOutbound({ ...payload, outboundId: `OUT${Date.now()}` });
-    }
-    setData([...store.getState().outbounds]);
-    setIsModalOpen(false);
+  const handleOpenEdit = (item: OutboundRecord) => {
+    setEditingId(item.id);
+    setFormData({
+      warehouseId: item.warehouseId,
+      warehouseName: item.warehouseName,
+      destination: item.destination,
+      productId: item.productId,
+      productName: item.productName,
+      sku: item.sku,
+      quantity: item.quantity,
+      operator: item.operator,
+      outboundDate: item.outboundDate,
+      status: item.status,
+      reason: item.reason,
+      notes: item.notes,
+    });
+    setIsModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t('confirmDelete'))) {
+    if (window.confirm('确定要删除这条出库记录吗？')) {
       store.deleteOutbound(id);
-      setData([...store.getState().outbounds]);
+      refresh();
     }
   };
 
-  const getStatusBadgeType = (status: string) => {
-    switch (status) {
-      case 'pending': return 'warning';
-      case 'approved': return 'info';
-      case 'completed': return 'success';
-      case 'cancelled': return 'danger';
-      default: return 'info';
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingId) {
+      store.updateOutbound(editingId, formData);
+    } else {
+      store.addOutbound(formData);
     }
+    setIsModalOpen(false);
+    refresh();
+  };
+
+  const handleWarehouseChange = (id: string) => {
+    const w = warehouses.find(i => i.id === id);
+    setFormData(prev => ({ ...prev, warehouseId: id, warehouseName: w?.name || '' }));
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('outboundManagement')}</h1>
-        <Button onClick={() => handleOpenModal()}>{t('addOutbound')}</Button>
-      </div>
-
-      <div className="flex gap-4 mb-6">
-        <div className="w-48">
-          <Select 
-            value={warehouseFilter} 
-            onChange={(e) => setWarehouseFilter(e.target.value)}
-            options={[
-              { label: t('allWarehouses'), value: 'all' },
-              ...warehouses.map(w => ({ label: w.name, value: w.id }))
-            ]}
-          />
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">出库管理</h1>
+          <p className="text-gray-500 text-sm mt-1">管理商品的库房出库流程和去向跟踪</p>
         </div>
-        <div className="flex-1">
-          <Input 
-            placeholder={t('searchPlaceholder')} 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <Button onClick={handleOpenAdd}>
+          <Plus size={18} />
+          新增出库
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {['id', 'warehouse', 'destination', 'product', 'quantity', 'operator', 'date', 'status', 'reason', 'actions'].map(col => (
-                <th key={col} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t(`outbound.${col}`)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.map((item) => (
-              <tr key={item.outboundId}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.outboundId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{warehouses.find(w => w.id === item.warehouseId)?.name || item.warehouseId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.destination}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.productName} ({item.sku})</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.operator}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.outboundDate}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge type={getStatusBadgeType(item.status)}>{t(item.status)}</Badge>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs">{item.reason}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button onClick={() => handleOpenModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">{t('edit')}</button>
-                  <button onClick={() => handleDelete(item.outboundId)} className="text-red-600 hover:text-red-900">{t('delete')}</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-between items-center mt-6">
-        <span className="text-sm text-gray-700">
-          {t('paginationInfo', { current: currentPage, total: totalPages })}
-        </span>
-        <div className="flex gap-2">
-          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>{t('prev')}</Button>
-          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>{t('next')}</Button>
-        </div>
-      </div>
-
-      {/* Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title={editingItem ? t('editOutbound') : t('addOutbound')}
-        footer={
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>{t('cancel')}</Button>
-            <Button onClick={handleSave}>{t('save')}</Button>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="搜索单号、商品、目的地..."
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
-        }
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <Select 
-            label={t('warehouse')}
-            className="col-span-2"
-            value={formData.warehouseId}
-            onChange={(e) => setFormData({...formData, warehouseId: e.target.value})}
-            options={warehouses.map(w => ({ label: w.name, value: w.id }))}
-          />
-          <Input 
-            label={t('productName')}
-            value={formData.productName}
-            onChange={(e) => setFormData({...formData, productName: e.target.value})}
-          />
-          <Input 
-            label={t('sku')}
-            value={formData.sku}
-            onChange={(e) => setFormData({...formData, sku: e.target.value})}
-          />
-          <Input 
-            label={t('destination')}
-            className="col-span-2"
-            value={formData.destination}
-            onChange={(e) => setFormData({...formData, destination: e.target.value})}
-          />
-          <Input 
-            type="number"
-            label={t('quantity')}
-            value={formData.quantity}
-            onChange={(e) => setFormData({...formData, quantity: Number(e.target.value)})}
-          />
-          <Input 
-            label={t('operator')}
-            value={formData.operator}
-            onChange={(e) => setFormData({...formData, operator: e.target.value})}
-          />
-          <Input 
-            type="date"
-            label={t('outboundDate')}
-            value={formData.outboundDate}
-            onChange={(e) => setFormData({...formData, outboundDate: e.target.value})}
-          />
-          <Select 
-            label={t('status')}
-            value={formData.status}
-            onChange={(e) => setFormData({...formData, status: e.target.value as any})}
-            options={[
-              { label: t('pending'), value: 'pending' },
-              { label: t('approved'), value: 'approved' },
-              { label: t('completed'), value: 'completed' },
-              { label: t('cancelled'), value: 'cancelled' },
-            ]}
-          />
-          <Input 
-            label={t('reason')}
-            className="col-span-2"
-            value={formData.reason}
-            onChange={(e) => setFormData({...formData, reason: e.target.value})}
-          />
-          <Input 
-            label={t('notes')}
-            className="col-span-2"
-            value={formData.notes}
-            onChange={(e) => setFormData({...formData, notes: e.target.value})}
-          />
+          <div className="flex items-center gap-2">
+            <Warehouse size={18} className="text-gray-400" />
+            <select
+              className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={warehouseFilter}
+              onChange={e => setWarehouseFilter(e.target.value)}
+            >
+              <option value="all">所有仓库</option>
+              {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter size={18} className="text-gray-400" />
+            <select
+              className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+            >
+              <option value="all">全部状态</option>
+              <option value="pending">待审核</option>
+              <option value="approved">已审核</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">出库单号</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">仓库</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">目的地</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">商品名</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right">数量</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">操作员</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">日期</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">原因</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">状态</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {paginatedData.map(item => (
+                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-blue-600">{item.orderNo}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.warehouseName}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.destination}</td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{item.productName}</div>
+                    <div className="text-xs text-gray-400">{item.sku}</div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">{item.quantity}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.operator}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.outboundDate}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <span className="truncate max-w-[120px] inline-block">{item.reason}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <StatusBadge status={item.status} />
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => handleOpenEdit(item)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <Edit2 size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(item.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {paginatedData.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="px-6 py-12 text-center text-gray-400">
+                    暂无出库记录
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            共 {filteredData.length} 条 / 第 {page} 页
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+              上一页
+            </Button>
+            <Button variant="secondary" size="sm" disabled={page === totalPages || totalPages === 0} onClick={() => setPage(p => p + 1)}>
+              下一页
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingId ? '编辑出库单' : '新增出库单'}
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">出库仓库</label>
+              <select
+                required
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.warehouseId}
+                onChange={e => handleWarehouseChange(e.target.value)}
+              >
+                <option value="">选择仓库</option>
+                {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">目的地</label>
+              <input
+                required
+                type="text"
+                placeholder="客户姓名/地址/门店"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.destination}
+                onChange={e => setFormData(prev => ({ ...prev, destination: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">商品名称</label>
+              <input
+                required
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.productName}
+                onChange={e => setFormData(prev => ({ ...prev, productName: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">商品SKU</label>
+              <input
+                required
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.sku}
+                onChange={e => setFormData(prev => ({ ...prev, sku: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">出库数量</label>
+              <input
+                required
+                type="number"
+                min="1"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.quantity}
+                onChange={e => setFormData(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">出库原因</label>
+              <input
+                required
+                type="text"
+                placeholder="如：销售出库/调拨/退货"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.reason}
+                onChange={e => setFormData(prev => ({ ...prev, reason: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">操作员</label>
+              <input
+                required
+                type="text"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.operator}
+                onChange={e => setFormData(prev => ({ ...prev, operator: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">出库日期</label>
+              <input
+                required
+                type="date"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                value={formData.outboundDate}
+                onChange={e => setFormData(prev => ({ ...prev, outboundDate: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">状态</label>
+            <select
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              value={formData.status}
+              onChange={e => setFormData(prev => ({ ...prev, status: e.target.value as OrderStatus }))}
+            >
+              <option value="pending">待审核</option>
+              <option value="approved">已审核</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">备注</label>
+            <textarea
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              value={formData.notes}
+              onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
+              取消
+            </Button>
+            <Button type="submit">
+              确定
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );
