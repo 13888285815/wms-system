@@ -1,5 +1,5 @@
 {
-  "app": { "title": "WMS Système Cloud" },
+  "app": { "title": "Yinian ERP" },
   "nav": {
     "dashboard": "Tableau de bord", "warehouses": "Entrepôts", "inventory": "Inventaire",
     "inbound": "Entrées", "outbound": "Sorties", "orders": "Commandes",
