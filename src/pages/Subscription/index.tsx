@@ -79,7 +79,7 @@ const SubscriptionPage: React.FC = () => {
                 </span>
               </div>
               <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                升级您的 WMS 系统
+                升级您的意念ERP
               </h1>
               <p className="text-blue-100 text-lg max-w-2xl">
                 享受无限仓库管理、AI 智能库存预测及全球 24/7 技术支持。
