@@ -24,7 +24,7 @@ const navGroups = [
     ],
   },
   {
-    label: '仓储管理 WMS',
+    label: '仓储管理',
     items: [
       { label: '仓库管理', icon: Warehouse, page: 'warehouses' },
       { label: '库存管理', icon: Package, page: 'inventory' },
