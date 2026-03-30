@@ -56,7 +56,7 @@ const PAYROLL_STATUS: Record<string, { label: string; variant: 'default' | 'info
 };
 
 const HRPage: React.FC = () => {
-  const [, refresh] = useRefresh();
+  const refresh = useRefresh();
   const [activeTab, setActiveTab] = useState<'employees' | 'departments' | 'attendance' | 'payroll'>('employees');
   
   const state = erpStore.getState();
