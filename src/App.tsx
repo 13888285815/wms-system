@@ -27,11 +27,16 @@ import HRPage from './pages/HR';
 import CRMPage from './pages/CRM';
 import PurchasePage from './pages/Purchase';
 import ProductionPage from './pages/Production';
+import QualityPage from './pages/Quality';
+import PricePage from './pages/Price';
+import StocktakePage from './pages/Stocktake';
+import WorkflowPage from './pages/Workflow';
 
 type Page =
   | 'dashboard' | 'warehouses' | 'inventory' | 'inbound' | 'outbound'
   | 'orders' | 'suppliers' | 'users' | 'reports' | 'settings' | 'subscription'
-  | 'finance' | 'hr' | 'crm' | 'purchase' | 'production';
+  | 'finance' | 'hr' | 'crm' | 'purchase' | 'production'
+  | 'quality' | 'price' | 'stocktake' | 'workflow';
 
 const pageTitles: Record<string, string> = {
   dashboard: '工作台',
@@ -50,6 +55,10 @@ const pageTitles: Record<string, string> = {
   crm: '客户关系',
   purchase: '采购管理',
   production: '生产管理',
+  quality: '质量管理',
+  price: '价格管理',
+  stocktake: '盘点管理',
+  workflow: '流程管理',
 };
 
 function App() {
@@ -65,7 +74,6 @@ function App() {
     const state = store.getState();
     if (state.currentUser) setCurrentUser(state.currentUser);
 
-    // Listen for direction changes (language switch)
     const observer = new MutationObserver(() => {
       setLayoutDir((document.documentElement.dir as 'ltr' | 'rtl') || 'ltr');
     });
@@ -96,6 +104,10 @@ function App() {
       case 'crm':          return <CRMPage />;
       case 'purchase':     return <PurchasePage />;
       case 'production':   return <ProductionPage />;
+      case 'quality':      return <QualityPage />;
+      case 'price':        return <PricePage />;
+      case 'stocktake':    return <StocktakePage />;
+      case 'workflow':     return <WorkflowPage />;
       default:             return <DashboardPage />;
     }
   };
@@ -113,7 +125,7 @@ function App() {
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header title={pageTitles[currentPage] || 'ERP Cloud'} onMenuClick={() => setSidebarOpen(true)} />
+        <Header title={pageTitles[currentPage] || '意念ERP'} onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           {renderPage()}
         </main>
