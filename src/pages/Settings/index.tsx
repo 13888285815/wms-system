@@ -207,7 +207,7 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-50 text-center">
-            <p className="text-gray-400 text-xs">© 2026 WMS Cloud Solutions. All rights reserved.</p>
+            <p className="text-gray-400 text-xs">© 2026 意念ERP. All rights reserved.</p>
           </div>
         </div>
       </section>
