@@ -172,7 +172,7 @@ const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
         </div>
         
         <p className="text-center text-white/30 text-xs mt-10 tracking-widest font-light">
-          &copy; 2026 WMS CLOUD SYSTEM &bull; SECURITY HARDENED
+          &copy; 2026 云南意念科技有限公司
         </p>
       </div>
     </div>
