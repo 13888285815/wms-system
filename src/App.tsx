@@ -68,7 +68,7 @@ function App() {
   const [layoutDir, setLayoutDir] = useState<'ltr' | 'rtl'>('ltr');
 
   useEffect(() => {
-    injectCSPMeta();
+    // injectCSPMeta() disabled — CSP meta tag blocks Vite dev server & GitHub Pages
     const currentDir = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
     setLayoutDir(currentDir);
     const state = store.getState();
