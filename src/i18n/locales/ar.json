@@ -1,5 +1,5 @@
 {
-  "app": { "title": "WMS نظام المستودعات السحابي" },
+  "app": { "title": "Yinian ERP" },
   "nav": {
     "dashboard": "لوحة القيادة", "warehouses": "إدارة المستودعات", "inventory": "إدارة المخزون",
     "inbound": "إدارة الوارد", "outbound": "إدارة الصادر", "orders": "إدارة الطلبات",
