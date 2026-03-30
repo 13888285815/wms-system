@@ -42,6 +42,10 @@ const navGroups = [
       { label: '客户关系', icon: Handshake, page: 'crm' },
       { label: '采购管理', icon: ClipboardList, page: 'purchase' },
       { label: '生产管理', icon: Factory, page: 'production' },
+      { label: '质量管理', icon: ShieldCheck, page: 'quality' },
+      { label: '价格管理', icon: Tag, page: 'price' },
+      { label: '盘点管理', icon: ScanLine, page: 'stocktake' },
+      { label: '流程管理', icon: GitBranch, page: 'workflow' },
     ],
   },
   {
