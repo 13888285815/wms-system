@@ -27,7 +27,7 @@ const PAYMENT_STATUS_MAP: Record<PaymentStatus, { label: string; color: string }
 };
 
 const FinancePage: React.FC = () => {
-  const [, refresh] = useRefresh();
+  const refresh = useRefresh();
   const [activeTab, setActiveTab] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
