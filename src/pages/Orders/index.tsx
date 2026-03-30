@@ -23,7 +23,7 @@ const StatusBadge: React.FC<{ status: OrderStatus }> = ({ status }) => {
 };
 
 const OrdersPage: React.FC = () => {
-  const [, refresh] = useRefresh();
+  const refresh = useRefresh();
   const { orders, warehouses } = store.getState();
   
   const [search, setSearch] = useState('');
