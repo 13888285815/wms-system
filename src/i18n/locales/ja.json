@@ -1,5 +1,5 @@
 {
-  "app": { "title": "WMS クラウド倉庫管理システム" },
+  "app": { "title": "意念ERP" },
   "nav": {
     "dashboard": "ダッシュボード", "warehouses": "倉庫管理", "inventory": "在庫管理",
     "inbound": "入庫管理", "outbound": "出庫管理", "orders": "注文管理",
