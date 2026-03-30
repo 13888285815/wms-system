@@ -7,7 +7,7 @@ import { Modal } from '../../components/ui/Modal';
 import { useRefresh } from '../../store/reactive';
 
 const Inventory: React.FC = () => {
-  const [, refresh] = useRefresh();
+  const refresh = useRefresh();
   const [search, setSearch] = useState('');
   const [warehouseFilter, setWarehouseFilter] = useState('all');
   const [page, setPage] = useState(1);
