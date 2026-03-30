@@ -79,8 +79,8 @@ const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
                 <ShieldCheck size={42} className="text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">WMS Cloud</h1>
-              <p className="text-white/50 text-sm mt-2">新一代云端仓库管理系统</p>
+              <h1 className="text-3xl font-bold text-white tracking-tight">意念ERP</h1>
+              <p className="text-white/50 text-sm mt-2">新一代云端企业资源管理系统</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
