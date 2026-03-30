@@ -22,7 +22,7 @@ const StatusBadge: React.FC<{ status: OrderStatus }> = ({ status }) => {
 };
 
 const InboundPage: React.FC = () => {
-  const [, refresh] = useRefresh();
+  const refresh = useRefresh();
   const { inbound, warehouses, suppliers } = store.getState();
   
   const [search, setSearch] = useState('');
